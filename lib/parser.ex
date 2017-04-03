@@ -32,9 +32,21 @@ defmodule Sammal.Parser do
     end
   end
 
-  def parse([t | ts]), do: {symbol(t), ts}
+  def parse([t | ts]), do: {parse_one(t), ts}
 
-  def symbol(token) when is_binary(token) do
+
+  @doc ~S"""
+  Given a token, returns a matching raw data type.
+
+  ## Example
+
+    iex> Sammal.Parser.parse_one("12")
+    12
+
+    iex> Sammal.Parser.parse_one("12.12")
+    12.12
+  """
+  def parse_one(token) when is_binary(token) do
     case Integer.parse(token) do
       {val, ""} -> val
       :error -> String.to_atom(token)
