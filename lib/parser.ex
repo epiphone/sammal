@@ -15,22 +15,22 @@ defmodule Sammal.Parser do
     {[:begin, [:define, [:x, 10], [:y, 12]]], []}
   """
   def parse(["(" | tokens]) do
-    exp =
-    tokens
-    |> Stream.unfold(fn [")" | _] -> nil;
-                        ts ->
-                          {exp, rest} = parse(ts)
-                          {{exp, rest}, rest}
-                     end)
-    |> Enum.to_list
-
-    remainder = List.last(exp) |> elem(1)
-    expression = Enum.map(exp, fn {v, _} -> v end)
-    case remainder do
-      [")" | rem] -> {expression, rem}
-      _ -> {expression, remainder}
-    end
+    resp = tokens
+    |> Stream.unfold(fn ts ->
+      IO.inspect parse(ts), pretty: true
+      case parse(ts) do
+        {:end, rest} -> nil
+        {val, rest} -> {{val, rest}, rest}
+      end
+    end)
+    |> Enum.reduce({[], tokens}, fn {i, [_ | rest]}, {acc, _} ->
+      {acc ++ [i], rest}
+    end)
+    IO.inspect {"resp", resp}, pretty: true
+    resp
   end
+
+  def parse([")" | ts]), do: {:end, ts}
 
   def parse([t | ts]), do: {parse_one(t), ts}
 
