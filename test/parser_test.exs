@@ -17,6 +17,7 @@ defmodule Sammal.ParserTest do
     assert parse(~w/( define x 10 )/) == {[[:define, :x, 10]], []}
     assert parse(~w/( + ( - 3 1 ) ( \/ 6 2 ) )/) == {[[:+, [:-, 3, 1], [:/, 6, 2]]], []}
     assert parse(~w/( 1 ( 2 ( 3 ( 4 ) 5 ) 6 ) 7 )/) == {[[1, [2, [3, [4], 5], 6], 7]], []}
+    assert parse(~w/a 10 ( x ) ( y )/) == {[:a, 10, [:x], [:y]], []}
   end
 
   test "parse_one/1 converts tokens into matching data types" do

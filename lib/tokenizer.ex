@@ -4,16 +4,18 @@ defmodule Sammal.Tokenizer do
   """
 
   @doc ~S"""
-  Splits a raw input string into a list of token strings.
+  Splits a line of raw input into a list of token strings.
 
   ## Example
 
     iex> Sammal.Tokenizer.tokenize("(begin (define x 10))")
     ["(", "begin", "(", "define", "x", "10", ")", ")"]
   """
-  def tokenize(input) do
-    input
-    |> String.replace(~r/[()]/, " \\0 ")
-    |> String.split
+  def tokenize(";" <> _), do: []
+  def tokenize(line, row_index \\ 0) do
+    Regex.scan(~r/([()]|".*"|[\w-]+)/, line, return: :index)
+    |> Enum.map(fn [_ | [{i, n}]] ->
+      String.slice(line,  i, n)
+    end)
   end
 end
