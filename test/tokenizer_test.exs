@@ -13,24 +13,32 @@ defmodule Sammal.TokenizerTest do
   end
 
   test "tokenizes a raw input string" do
-    assert tokenize("(define x 10)") |> Enum.map(&(&1.lexeme)) == ~w/( define x 10 )/
-    assert tokenize(" ( begin (define x (1 2)))") |> Enum.map(&(&1.lexeme)) == ~w/( begin ( define x ( 1 2  ) ) )/
+    assert lexemes("(define x 10)") == ~w/( define x 10 )/
+    assert lexemes(" ( begin (define x (1 2)))") == ~w/( begin ( define x ( 1 2  ) ) )/
   end
 
   test "omits empty strings" do
     assert tokenize(" ") == []
-    assert tokenize(" x   y  z  ") |> Enum.map(&(&1.lexeme)) == ~w/x y z/
+    assert lexemes(" x   y  z  ") == ~w/x y z/
   end
 
   test "tokenizes parenthesis separately" do
-    assert tokenize("(a)") |> Enum.map(&(&1.lexeme)) == ~w/( a )/
-    assert tokenize("((()))") |> Enum.map(&(&1.lexeme)) == ~w/( ( ( ) ) )/
+    assert lexemes("(a)") == ~w/( a )/
+    assert lexemes("((()))") == ~w/( ( ( ) ) )/
   end
 
   test "tokenizes strings with whitespace" do
-    assert tokenize("\"asd\"") |> Enum.map(&(&1.lexeme)) == ["\"asd\""]
-    assert tokenize("\"asd dsa\"") |> Enum.map(&(&1.lexeme)) == ["\"asd dsa\""]
-    assert tokenize("(define x \"asd dsa\")") |> Enum.map(&(&1.lexeme)) == ["(", "define", "x", "\"asd dsa\"", ")"]
+    assert lexemes("\"asd\"") == ["\"asd\""]
+    assert lexemes("\"asd dsa\"") == ["\"asd dsa\""]
+    assert lexemes("(define x \"asd dsa\")") == ["(", "define", "x", "\"asd dsa\"", ")"]
+  end
+
+  test "tokenizes odd number of quotes" do
+    assert lexemes("\"xs") == ["\"xs"]
+    assert lexemes("\"xs ys") == ["\"xs ys"]
+    assert lexemes("\"xs\" ys") == ["\"xs\"", "ys"]
+    assert lexemes("\"xs\"x\" ys zs") == ["\"xs\"", "x", "\" ys zs"]
+    assert lexemes("\"xs\"(x)\"") == ["\"xs\"", "(", "x", ")", "\""]
   end
 
   test "ignores comment lines" do
@@ -38,4 +46,6 @@ defmodule Sammal.TokenizerTest do
     assert tokenize(";some comment") == []
     assert tokenize("; some comment") == []
   end
+
+  defp lexemes(line), do: line |> tokenize |> Enum.map(&(&1.lexeme))
 end

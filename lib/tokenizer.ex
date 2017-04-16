@@ -17,9 +17,10 @@ defmodule Sammal.Tokenizer do
      %Sammal.Token{lexeme: "10", line: 0, index: 10},
      %Sammal.Token{lexeme: ")", line: 0, index: 12}]
   """
-  def tokenize(";" <> _), do: []
-  def tokenize(line, row_index \\ 0) do
-    Regex.scan(~r/([()]|".*"|[\w-]+)/, line, return: :index)
+  def tokenize(line, row_index \\ 0)
+  def tokenize(";" <> _, row_index), do: []
+  def tokenize(line, row_index) do
+    Regex.scan(~r/([()]|"[^"]*"?|[\w-]+)/, line, return: :index)
     |> Enum.map(fn [_ | [{i, n}]] ->
       %Token{lexeme: String.slice(line,  i, n),
              line: row_index,
