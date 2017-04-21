@@ -24,31 +24,8 @@ defmodule Sammal.Parser do
     {[val | val2], rest2}
   end
 
-  def parse([t | ts]) do
+  def parse([%Token{value: value} | ts]) do
     {val, rest} = parse(ts)
-    {[parse_one(t) | val], rest}
-  end
-
-
-  @doc ~S"""
-  Given a token, returns a matching raw data type.
-
-  ## Example
-
-    iex> Sammal.Parser.parse_one(%Sammal.Token{lexeme: "12"})
-    12
-
-    iex> Sammal.Parser.parse_one(%Sammal.Token{lexeme: "12.12"})
-    12.12
-  """
-  def parse_one(%Token{lexeme: lexeme}) do
-    case Integer.parse(lexeme) do
-      {val, ""} -> val
-      :error -> String.to_atom(lexeme)
-      {val, _} -> case Float.parse(lexeme) do
-        {val, ""} -> val
-        _ -> String.to_atom(lexeme)
-      end
-    end
+    {[value | val], rest}
   end
 end

@@ -7,9 +7,9 @@ defmodule Sammal.TokenizerTest do
 
 
   test "tokenizes into a Token struct" do
-    assert tokenize("x value 10") == [%Token{lexeme: "x", line: 0, index: 0},
-                                      %Token{lexeme: "value", line: 0, index: 2},
-                                      %Token{lexeme: "10", line: 0, index: 8}]
+    assert tokenize("x \"y\" 10") == [%Token{lexeme: "x", line: 0, index: 0, value: :x},
+                                      %Token{lexeme: "\"y\"", line: 0, index: 2, value: "y"},
+                                      %Token{lexeme: "10", line: 0, index: 6, value: 10}]
   end
 
   test "tokenizes a raw input string" do
@@ -33,18 +33,34 @@ defmodule Sammal.TokenizerTest do
     assert lexemes("(define x \"asd dsa\")") == ["(", "define", "x", "\"asd dsa\"", ")"]
   end
 
-  test "tokenizes odd number of quotes" do
-    assert lexemes("\"xs") == ["\"xs"]
-    assert lexemes("\"xs ys") == ["\"xs ys"]
-    assert lexemes("\"xs\" ys") == ["\"xs\"", "ys"]
-    assert lexemes("\"xs\"x\" ys zs") == ["\"xs\"", "x", "\" ys zs"]
-    assert lexemes("\"xs\"(x)\"") == ["\"xs\"", "(", "x", ")", "\""]
+  test "tokenizes floats" do
+    assert lexemes("12.12") == ["12.12"]
+    assert lexemes("12.12 0.04") == ["12.12", "0.04"]
+  end
+
+  test "returns an error when odd number of quotes" do
+    # TODO proper exception handling
+    assert_raise RuntimeError, fn ->
+      lexemes("\"xs")
+    end
+    # assert lexemes("\"xs") == ["\"xs"]
+    # assert lexemes("\"xs ys") == ["\"xs ys"]
+    # assert lexemes("\"xs\" ys") == ["\"xs\"", "ys"]
+    # assert lexemes("\"xs\"x\" ys zs") == ["\"xs\"", "x", "\" ys zs"]
+    # assert lexemes("\"xs\"(x)\"") == ["\"xs\"", "(", "x", ")", "\""]
   end
 
   test "ignores comment lines" do
     assert tokenize(";") == []
     assert tokenize(";some comment") == []
     assert tokenize("; some comment") == []
+  end
+
+  test "converts lexemes into matching data Elixir values" do
+    assert lexeme_to_value("12") == 12
+    assert lexeme_to_value("12.12") == 12.12
+    assert lexeme_to_value("atom") == :atom
+    assert lexeme_to_value("-10") == -10
   end
 
   defp lexemes(line), do: line |> tokenize |> Enum.map(&(&1.lexeme))
