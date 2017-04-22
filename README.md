@@ -21,6 +21,9 @@ mix test
 
 ## TODO
 
+- handle empty after quote `x'`
+- quasiquote
+- disallow special chars in symbols
 - string interpolation
 - range operations? `0..10`, `0..-1`, ...
 - macros

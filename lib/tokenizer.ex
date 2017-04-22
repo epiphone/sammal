@@ -20,7 +20,7 @@ defmodule Sammal.Tokenizer do
   def tokenize(line, row_index \\ 0)
   def tokenize(";" <> _, row_index), do: []
   def tokenize(line, row_index) do
-    Regex.scan(~r/([()]|"[^"]*"?|[\w-+\/.]+)/, line, return: :index)
+    Regex.scan(~r/(['()]|"[^"]*"?|[\w-+\/.]+)/, line, return: :index)
     |> Enum.map(fn [_ | [{i, n}]] ->
       lexeme = String.slice(line,  i, n)
       %Token{lexeme: lexeme,

@@ -24,6 +24,12 @@ defmodule Sammal.Parser do
     {[val | val2], rest2}
   end
 
+  def parse([%Token{lexeme: "'"} | ts]) do
+    {[val | tail], rest} = parse(ts)
+    {val2, rest2} = parse(rest)
+    {[[:quote, val] | tail] ++ val2, rest2}
+  end
+
   def parse([%Token{value: value} | ts]) do
     {val, rest} = parse(ts)
     {[value | val], rest}

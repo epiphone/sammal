@@ -35,7 +35,7 @@ defmodule Sammal.TokenizerTest do
 
   test "tokenizes floats" do
     assert lexemes("12.12") == ["12.12"]
-    assert lexemes("12.12 0.04") == ["12.12", "0.04"]
+    assert lexemes("-12.12 0.04") == ["-12.12", "0.04"]
   end
 
   test "returns an error when odd number of quotes" do
@@ -59,8 +59,14 @@ defmodule Sammal.TokenizerTest do
   test "converts lexemes into matching data Elixir values" do
     assert lexeme_to_value("12") == 12
     assert lexeme_to_value("12.12") == 12.12
-    assert lexeme_to_value("atom") == :atom
     assert lexeme_to_value("-10") == -10
+    assert lexeme_to_value("atom") == :atom
+    assert lexeme_to_value("\"not an atom\"") == "not an atom"
+  end
+
+  test "tokenizes quotes" do
+    assert lexemes("'x") == ["'", "x"]
+    assert lexemes("('x '(10)") == ["(", "'", "x", "'", "(", "10", ")"]
   end
 
   defp lexemes(line), do: line |> tokenize |> Enum.map(&(&1.lexeme))
