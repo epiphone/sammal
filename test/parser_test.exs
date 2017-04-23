@@ -7,25 +7,27 @@ defmodule Sammal.ParserTest do
 
 
   test "parses symbols" do
-    assert "12" |> tokenize |> parse == {[12], [], []}
-    assert "2 3" |> tokenize |> parse == {[2, 3], [], []}
-    assert "2.1 3" |> tokenize |> parse == {[2.1, 3], [], []}
-    assert "atom 3" |> tokenize |> parse == {[:atom, 3], [], []}
-    assert "1 2 ( define x )" |> tokenize |> parse == {[1, 2, [:define, :x]], [], []}
+    assert ast("12") == [12]
+    assert ast("2 3") == [2, 3]
+    assert ast("2.1 3") == [2.1, 3]
+    assert ast("atom 3") == [:atom, 3]
+    assert ast("1 2 ( define x )") == [1, 2, [:define, :x]]
   end
 
   test "parses nested expressions" do
-    assert "(define x 10 )" |> tokenize |> parse == {[[:define, :x, 10]], [], []}
-    assert "(+ (- 3 1) (\/ 6 2 ) )" |> tokenize |> parse == {[[:+, [:-, 3, 1], [:/, 6, 2]]], [], []}
-    assert "(1 ( 2 (3 (4 ) 5) 6 ) 7 )" |> tokenize |> parse == {[[1, [2, [3, [4], 5], 6], 7]], [], []}
-    assert "a 10 ( x ) (y )" |> tokenize |> parse == {[:a, 10, [:x], [:y]], [], []}
+    assert ast("(define x 10 )") == [[:define, :x, 10]]
+    assert ast("(+ (- 3 1) (\/ 6 2 ) )") == [[:+, [:-, 3, 1], [:/, 6, 2]]]
+    assert ast("(1 ( 2 (3 (4 ) 5) 6 ) 7 )") == [[1, [2, [3, [4], 5], 6], 7]]
+    assert ast("a 10 ( x ) (y )") == [:a, 10, [:x], [:y]]
   end
 
   test "extends quoted expressions" do
-    assert "'x" |> tokenize |> parse == {[[:quote, :x]], [], []}
-    assert "'x y" |> tokenize |> parse == {[[:quote, :x], :y], [], []}
-    assert "'(x 10)" |> tokenize |> parse == {[[:quote, [:x, 10]]], [], []}
-    assert "'x 'y" |> tokenize |> parse == {[[:quote, :x,], [:quote, :y]], [], []}
-    # assert "'" |> tokenize |> parse == ?? # TODO
+    assert ast("'x") == [[:quote, :x]]
+    assert ast("'x y") == [[:quote, :x], :y]
+    assert ast("'(x 10)") == [[:quote, [:x, 10]]]
+    assert ast("'x 'y") == [[:quote, :x,], [:quote, :y]]
+    # assert ast("'") == ?? # TODO
   end
+
+  defp ast(line), do: line |> tokenize |> elem(0) |> parse |> elem(0)
 end

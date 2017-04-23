@@ -13,7 +13,7 @@ defmodule Sammal.Parser do
 
   ## Example
 
-    iex> Sammal.Tokenizer.tokenize("(begin (define (x 10) (y 12)))") |> Sammal.Parser.parse
+    iex> Sammal.Tokenizer.tokenize("(begin (define (x 10) (y 12)))") |> elem(0) |> Sammal.Parser.parse
     {[[:begin, [:define, [:x, 10], [:y, 12]]]], [], []}
   """
   def parse([]), do: {[], [], []}
