@@ -10,7 +10,7 @@ A toy Lisp interpreter for a compilers class.
 
 ```bash
 mix escript.build
-./sammal
+./sammal [-c "(some command)"] [-i] [./some_source_file.sammal]
 ```
 
 ## Test
@@ -21,7 +21,11 @@ mix test
 
 ## TODO
 
+- fix tokenizing "\x\"y"
+- file IO
+- REPL
 - handle empty after quote `x'`
+- error reporting
 - quasiquote
 - disallow special chars in symbols
 - string interpolation

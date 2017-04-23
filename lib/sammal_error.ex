@@ -3,7 +3,7 @@ defmodule Sammal.SammalError do
 end
 
 defimpl String.Chars, for: Sammal.SammalError do
-  def to_string(%{expected: exp, token: t, type: :unexpected}) do
+  def to_string(%{expected: exp, token: t, type: :unexpected_token}) do
     "Unexpected token '#{t.lexeme}' at #{t.line}:#{t.index} - expecting '#{exp}'"
   end
 

@@ -3,7 +3,7 @@ defmodule Sammal.ParserTest do
   doctest Sammal.Parser
 
   import Sammal.{Parser, Tokenizer}
-  alias Sammal.Token
+  alias Sammal.{SammalError, Token}
 
 
   test "parses symbols" do
@@ -29,5 +29,22 @@ defmodule Sammal.ParserTest do
     # assert ast("'") == ?? # TODO
   end
 
+  test "parses a single expression" do
+    assert {[], [], []} = expression("()")
+    assert {[:x, [:y], :z], [], []}= expression("(x (y) z)")
+    assert {[:x, [:y]], [_, _], []} = expression("(x (y)) z)")
+  end
+
+  test "returns error when parsing invalid expressions" do
+    assert {_, _, [%SammalError{type: :unexpected_token}]} = expression("x")
+    assert {_, _, [%SammalError{type: :unexpected_token}]} = expression(")")
+    assert {_, _, [%SammalError{type: :unexpected_token}]} = expression("(")
+    assert {_, _, [%SammalError{type: :unexpected_token}]} = expression("x y)")
+    assert {_, _, [%SammalError{type: :unexpected_token}]} = expression("(x")
+    assert {_, _, [%SammalError{type: :unexpected_token}]} = expression("(x (y)")
+    assert {_, _, [%SammalError{type: :unexpected_token}]} = expression("((x)")
+  end
+
   defp ast(line), do: line |> tokenize |> elem(0) |> parse |> elem(0)
+  defp expression(line), do: line |> tokenize |> elem(0) |> parse_expression
 end

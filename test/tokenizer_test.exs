@@ -3,13 +3,17 @@ defmodule Sammal.TokenizerTest do
   doctest Sammal.Tokenizer
 
   import Sammal.Tokenizer
-  alias Sammal.Token
+  alias Sammal.{SammalError, Token}
 
 
   test "tokenizes into a Token struct" do
     assert tokenize("x \"y\" 10") == {[%Token{lexeme: "x", line: 0, index: 0, value: :x},
                                        %Token{lexeme: "\"y\"", line: 0, index: 2, value: "y"},
                                        %Token{lexeme: "10", line: 0, index: 6, value: 10}], []}
+  end
+
+  test "ignore token and return error when invalid token" do
+    assert {[], [%SammalError{}]} = tokenize "\"invalid_string"
   end
 
   test "tokenizes a raw input string" do
