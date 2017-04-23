@@ -62,6 +62,8 @@ defmodule Sammal.TokenizerTest do
     assert lexeme_to_value("-10") == -10
     assert lexeme_to_value("atom") == :atom
     assert lexeme_to_value("\"not an atom\"") == "not an atom"
+    assert lexeme_to_value("#t") == true
+    assert lexeme_to_value("#f") == false
   end
 
   test "tokenizes quotes" do

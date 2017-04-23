@@ -4,6 +4,7 @@ defmodule Sammal.Parser do
   """
   alias Sammal.Token
 
+
   @doc ~S"""
   Parses a list of tokens into an AST.
 
@@ -17,21 +18,31 @@ defmodule Sammal.Parser do
   """
   def parse([]), do: {[], []}
   def parse([%Token{lexeme: ")"} | ts]), do: {[], ts}
-
-  def parse([%Token{lexeme: "("} | ts]) do
-    {val, rest} = parse(ts)
+  def parse(ts) do
+    {val, rest} = parse_next(ts)
     {val2, rest2} = parse(rest)
-    {[val | val2], rest2}
+    {val ++ val2, rest2}
   end
 
-  def parse([%Token{lexeme: "'"} | ts]) do
-    {[val | tail], rest} = parse(ts)
+  # def parse_expression([]), do: {[], []}
+  # def parse_expression([%Token{lexeme: ")"} | ts]), do: {[], ts}
+  def parse_expression([%Token{lexeme: "("} | ts]) do
+    {val, rest} = parse_next(ts)
     {val2, rest2} = parse(rest)
-    {[[:quote, val] | tail] ++ val2, rest2}
+    {val ++ val2, rest2}
   end
 
-  def parse([%Token{value: value} | ts]) do
-    {val, rest} = parse(ts)
-    {[value | val], rest}
+  def parse_next([%Token{lexeme: "("} | ts]) do
+     {val, rest} = parse(ts)
+     {[val], rest}
+  end
+
+  def parse_next([%Token{lexeme: "'"} | ts]) do
+    {val, rest} = parse_next(ts)
+    {[[:quote | val]], rest}
+  end
+
+  def parse_next([%Token{value: value} | ts]) do
+    {[value], ts}
   end
 end
