@@ -14,35 +14,35 @@ defmodule Sammal.Parser do
   ## Example
 
     iex> Sammal.Tokenizer.tokenize("(begin (define (x 10) (y 12)))") |> Sammal.Parser.parse
-    {[[:begin, [:define, [:x, 10], [:y, 12]]]], []}
+    {[[:begin, [:define, [:x, 10], [:y, 12]]]], [], []}
   """
-  def parse([]), do: {[], []}
-  def parse([%Token{lexeme: ")"} | ts]), do: {[], ts}
+  def parse([]), do: {[], [], []}
+  def parse([%Token{lexeme: ")"} | ts]), do: {[], ts, []}
   def parse(ts) do
-    {val, rest} = parse_next(ts)
-    {val2, rest2} = parse(rest)
-    {val ++ val2, rest2}
+    {val, rest, err} = parse_next(ts)
+    {val2, rest2, err2} = parse(rest)
+    {val ++ val2, rest2, err ++ err2}
   end
 
   # def parse_expression([]), do: {[], []}
   # def parse_expression([%Token{lexeme: ")"} | ts]), do: {[], ts}
   def parse_expression([%Token{lexeme: "("} | ts]) do
-    {val, rest} = parse_next(ts)
-    {val2, rest2} = parse(rest)
-    {val ++ val2, rest2}
+    {val, rest, err} = parse_next(ts)
+    {val2, rest2, err2} = parse(rest)
+    {val ++ val2, rest2, err ++ err2}
   end
 
   def parse_next([%Token{lexeme: "("} | ts]) do
-     {val, rest} = parse(ts)
-     {[val], rest}
+     {val, rest, err} = parse(ts)
+     {[val], rest, err}
   end
 
   def parse_next([%Token{lexeme: "'"} | ts]) do
-    {val, rest} = parse_next(ts)
-    {[[:quote | val]], rest}
+    {val, rest, err} = parse_next(ts)
+    {[[:quote | val]], rest, err}
   end
 
   def parse_next([%Token{value: value} | ts]) do
-    {[value], ts}
+    {[value], ts, []}
   end
 end
