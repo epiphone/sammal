@@ -1,14 +1,18 @@
 defmodule Sammal.SammalError do
-  defstruct [:type, :token, :expected]
-end
+  defstruct [:expected, :message, :token, :type]
 
-defimpl String.Chars, for: Sammal.SammalError do
-  def to_string(%{expected: exp, token: t, type: :unexpected_token}) do
-    "Unexpected token '#{t.lexeme}' at #{t.line}:#{t.index} - expecting '#{exp}'"
+  @doc """
+  Construct an error struct.
+  """
+  def new(type, %Sammal.Token{} = token, expected \\ nil) do
+    token_str = "'#{token.lexeme}' at #{token.line}:#{token.index}"
+    message =
+      case type do
+        :ending_quote -> "Missing ending quote for #{token_str}"
+        :unexpected_token -> "Unexpected token #{token_str} - expecting '#{expected}'"
+        _ -> "Invalid token #{token_str}"
+      end
+
+    %__MODULE__{expected: expected, message: message, token: token, type: type}
   end
-
-  def to_string(%{token: t, type: :ending_quote}) do
-    "Missing ending quote for '#{t.lexeme}' at #{t.line}:#{t.index}"
-  end
 end
-
