@@ -9,8 +9,12 @@ A toy Lisp interpreter for a compilers class.
 ## Build
 
 ```bash
+mix deps.get
 mix escript.build
 ./sammal [-c "(some command)"] [-i] [./some_source_file.sammal]
+
+# Examples:
+./sammal -c "(def multiply (x y) (* x y)) (display (multiply 2 3))"
 ```
 
 ## Test
@@ -21,13 +25,14 @@ mix test
 
 ## TODO
 
-- fix tokenizing "\x\"y"
-- file IO
-- REPL
-- handle empty after quote `x'`
-- error reporting
-- quasiquote
-- disallow special chars in symbols
-- string interpolation
-- range operations? `0..10`, `0..-1`, ...
-- macros
+- [x] quoting
+- [ ] fix tokenizing "\x\"y"
+- [ ] file IO
+- [ ] REPL
+- [ ] handle empty after quote `x'`
+- [x] error reporting
+- [ ] quasiquote
+- [ ] disallow special chars in symbols
+- [ ] string interpolation
+- [ ] range operations? `0..10`, `0..-1`, ...
+- [ ] macros

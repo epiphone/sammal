@@ -2,8 +2,8 @@ defmodule Sammal do
   @moduledoc """
   Sammal main module.
   """
-
-  import Sammal.{Tokenizer, Parser}
+  import Sammal.Parser, only: [parse: 1]
+  import Sammal.Tokenizer, only: [tokenize: 1]
 
   @doc """
   Program entry point.
@@ -35,14 +35,12 @@ defmodule Sammal do
   end
 
   def run_command(input) do
-    with {tokens, []} <- tokenize(input),
-         {parse_tree, [], []} <- parse_expression(tokens) do
-      IO.inspect parse_tree, pretty: true # TODO evaluate here
+    with {:ok, tokens} <- tokenize(input),
+         {:ok, {ast, []}} <- parse(tokens) do
+      IO.inspect ast, pretty: true # TODO evaluate here
     else
-      {_, errors} ->
-        show_failure(errors, "Token error on command")
-      {_, _, errors} ->
-        show_failure(errors, "Parsing error on command")
+      {:error, %Sammal.SammalError{message: message}} ->
+        IO.puts message
     end
   end
 

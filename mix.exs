@@ -29,6 +29,6 @@ defmodule Sammal.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [{:credo, "~> 0.8", only: [:dev, :test], runtime: false}]
   end
 end

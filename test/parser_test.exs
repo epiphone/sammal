@@ -2,49 +2,60 @@ defmodule Sammal.ParserTest do
   use ExUnit.Case, async: true
   doctest Sammal.Parser
 
-  import Sammal.{Parser, Tokenizer}
+  import Sammal.Parser
+  import Sammal.Tokenizer, only: [tokenize: 1]
   alias Sammal.{SammalError, Token}
 
 
-  test "parses symbols" do
-    assert ast("12") == [12]
-    assert ast("2 3") == [2, 3]
-    assert ast("2.1 3") == [2.1, 3]
-    assert ast("atom 3") == [:atom, 3]
-    assert ast("1 2 ( define x )") == [1, 2, [:define, :x]]
-  end
-
-  test "parses nested expressions" do
-    assert ast("(define x 10 )") == [[:define, :x, 10]]
-    assert ast("(+ (- 3 1) (\/ 6 2 ) )") == [[:+, [:-, 3, 1], [:/, 6, 2]]]
-    assert ast("(1 ( 2 (3 (4 ) 5) 6 ) 7 )") == [[1, [2, [3, [4], 5], 6], 7]]
-    assert ast("a 10 ( x ) (y )") == [:a, 10, [:x], [:y]]
-  end
-
-  test "extends quoted expressions" do
-    assert ast("'x") == [[:quote, :x]]
-    assert ast("'x y") == [[:quote, :x], :y]
-    assert ast("'(x 10)") == [[:quote, [:x, 10]]]
-    assert ast("'x 'y") == [[:quote, :x,], [:quote, :y]]
-    # assert ast("'") == ?? # TODO
+  test "parses atoms" do
+    assert_parse "1", [1]
+    assert_parse "23", [23]
+    assert_parse "2.1", [2.1]
+    assert_parse "x", [:x]
+    assert_parse "true", [:true]
+    assert_parse "#f", [:false]
+    assert_parse "somesymbol", [:"somesymbol"]
+    assert_parse "a_messy-symbol", [:"a_messy-symbol"]
   end
 
   test "parses a single expression" do
-    assert {[], [], []} = expression("()")
-    assert {[:x, [:y], :z], [], []}= expression("(x (y) z)")
-    assert {[:x, [:y]], [_, _], []} = expression("(x (y)) z)")
+    assert_parse "()", [[]]
+    assert_parse "(x)", [[:x]]
+    assert_parse "(define x 10)", [[:define, :x, 10]]
+  end
+
+  test "parses nested expressions" do
+    assert_parse "(x (y))", [[:x, [:y]]]
+    assert_parse "(((x)) (y))", [[[[:x]], [:y]]]
+    assert_parse "(+ (- 3 1) (\/ 6 2))", [[:+, [:-, 3, 1], [:/, 6, 2]]]
+    assert_parse "(1 (2 (3 (4) 3) 2) 1)", [[1, [2, [3, [4], 3], 2], 1]]
+  end
+
+  test "extends quoted expressions" do
+    assert_parse "'x", [[:quote, :x]]
+    assert_parse "('x y)", [[[:quote, :x], :y]]
+    assert_parse "'(x 10)", [[:quote, [:x, 10]]]
+    assert_parse "('x 'y)", [[[:quote, :x], [:quote, :y]]]
   end
 
   test "returns error when parsing invalid expressions" do
-    assert {_, _, [%SammalError{type: :unexpected_token}]} = expression("x")
-    assert {_, _, [%SammalError{type: :unexpected_token}]} = expression(")")
-    assert {_, _, [%SammalError{type: :unexpected_token}]} = expression("(")
-    assert {_, _, [%SammalError{type: :unexpected_token}]} = expression("x y)")
-    assert {_, _, [%SammalError{type: :unexpected_token}]} = expression("(x")
-    assert {_, _, [%SammalError{type: :unexpected_token}]} = expression("(x (y)")
-    assert {_, _, [%SammalError{type: :unexpected_token}]} = expression("((x)")
+    assert {:error, %SammalError{type: :unexpected_token}} = expr("x")
+    assert {:error, %SammalError{type: :unexpected_token}} = expr(")")
+    assert {:error, %SammalError{type: :unexpected_token}} = expr("x y)")
+    assert {:error, %SammalError{type: :unmatched_paren}} = expr("(")
+    assert {:error, %SammalError{type: :unmatched_paren}} = expr("(x")
+    assert {:error, %SammalError{type: :unmatched_paren}} = expr("(x (y)")
+    assert {:error, %SammalError{type: :unmatched_paren}} = expr("((x)")
+    assert {:error, %SammalError{type: :unmatched_paren}} = any("'(")
+    assert {:error, %SammalError{type: :unmatched_paren}} = any("'(x")
   end
 
-  defp ast(line), do: line |> tokenize |> elem(0) |> parse |> elem(0)
-  defp expression(line), do: line |> tokenize |> elem(0) |> parse_expression
+
+  # Helpers:
+
+  defp assert_parse(line, ast) do
+    assert {:ok, {^ast, []}} = {[], line |> tokenize |> elem(1)} |> parse_next
+  end
+  defp any(line), do: {[], line |> tokenize |> elem(1)} |> parse_next
+  defp expr(line), do: {[], line |> tokenize |> elem(1)} |> parse_expression
 end
