@@ -8,7 +8,11 @@ defmodule Sammal.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      escript: [main_module: Sammal],
-     deps: deps()]
+     deps: deps(),
+     dialyzer: [
+       flags: ["-Wunmatched_returns", :error_handling, :race_conditions, :underspecs]
+     ]
+    ]
   end
 
   # Configuration for the OTP application
@@ -29,6 +33,8 @@ defmodule Sammal.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:credo, "~> 0.8", only: [:dev, :test], runtime: false}]
+    [{:credo, "~> 0.8", only: [:dev, :test], runtime: false},
+     {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
+     {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false}]
   end
 end

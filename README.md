@@ -19,9 +19,8 @@ mix escript.build
 
 ## Test
 
-```bash
-mix test
-```
+`mix test` to run tests, or `mix test.watch` to automatically run tests, optional type checks and linter on file changes.
+
 
 ## TODO
 
