@@ -4,7 +4,7 @@ defmodule Sammal.ParserTest do
 
   import Sammal.Parser
   import Sammal.Tokenizer, only: [tokenize: 1]
-  alias Sammal.{SammalError, Token}
+  alias Sammal.{Expr, SammalError}
 
 
   test "parses atoms" do

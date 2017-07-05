@@ -2,21 +2,21 @@ defmodule Sammal.SammalError do
   @moduledoc """
   An error struct and helpers for generating error messages with context.
   """
-  defstruct [:expected, :message, :token, :type]
+  defstruct [:expected, :message, :expr, :type]
 
   @doc """
   Construct an error struct.
   """
-  def new(type, %Sammal.Token{} = token, expected \\ nil) do
-    token_str = "'#{token.lexeme}' at #{token.line}:#{token.index}"
+  def new(type, %Sammal.Expr{} = expr, expected \\ nil) do
+    expr_str = "'#{expr.lex}' at #{expr.line}:#{expr.row}"
     message =
       case type do
-        :ending_quote -> "Missing ending quote for #{token_str}"
-        :unexpected_token -> "Unexpected token #{token_str} - expecting '#{expected}'"
-        :unmatched_paren -> "Unmatched open parenthesis #{token_str}"
-        _ -> "Invalid token #{token_str}"
+        :ending_quote -> "Missing ending quote for #{expr_str}"
+        :unexpected_token -> "Unexpected expr #{expr_str} - expecting '#{expected}'"
+        :unmatched_paren -> "Unmatched open parenthesis #{expr_str}"
+        _ -> "Invalid expr #{expr_str}"
       end
 
-    %__MODULE__{expected: expected, message: message, token: token, type: type}
+    %__MODULE__{expected: expected, message: message, expr: expr, type: type}
   end
 end

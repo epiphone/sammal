@@ -5,7 +5,7 @@ defmodule Sammal.Parser do
   All the parse_* functions adhere to the following pattern:
     {AST, tokens} -> {:ok, {new AST, remaining tokens}} | {:error, error struct}
   """
-  alias Sammal.{SammalError, Token}
+  alias Sammal.{Expr, SammalError}
 
 
   @doc """
@@ -47,7 +47,7 @@ defmodule Sammal.Parser do
   @doc """
   Parse a single parenthesis-enclosed expression.
   """
-  def parse_expression({ast, [%Token{lexeme: "("} = head | tokens]}) do
+  def parse_expression({ast, [%Expr{lex: "("} = head | tokens]}) do
     case parse_until({[], tokens}, ")") do
       {:ok, {val, rest}} ->
         {:ok, {ast ++ [val], rest}}
@@ -69,9 +69,9 @@ defmodule Sammal.Parser do
   def parse_next({ast, tokens} = input) do
     # TODO instead of checking the first token, try parse_expression first and fallback to others? parser combinator-ish style
     case tokens do
-      [%Token{lexeme: "("} | _] ->
+      [%Expr{lex: "("} | _] ->
         parse_expression(input)
-      [%Token{lexeme: "'"} | ts] ->
+      [%Expr{lex: "'"} | ts] ->
         # TODO use helper
         case parse_next({[], ts}) do
           {:ok, {val, rest}} ->
@@ -79,7 +79,7 @@ defmodule Sammal.Parser do
           {:error, error} ->
             {:error, error}
         end
-      [%Token{value: value} | rest] ->
+      [%Expr{val: value} | rest] ->
         {:ok, {ast ++ [value], rest}}
     end
   end
@@ -88,7 +88,7 @@ defmodule Sammal.Parser do
   Parse up to (and including) the given lexeme.
   """
   def parse_until({_, []}, _), do: {:error, nil} # Error struct is formed higher up the call stack where context is available
-  def parse_until({ast, [%Token{lexeme: until} | rest]}, until), do: {:ok, {ast, rest}}
+  def parse_until({ast, [%Expr{lex: until} | rest]}, until), do: {:ok, {ast, rest}}
   def parse_until({ast, tokens} = input, until) do
     # TODO use helper
     case parse_next(input) do

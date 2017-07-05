@@ -3,13 +3,14 @@ defmodule Sammal.TokenizerTest do
   doctest Sammal.Tokenizer
 
   import Sammal.Tokenizer
-  alias Sammal.{SammalError, Token}
+  alias Sammal.{Expr, SammalError}
 
 
-  test "tokenizes into a Token struct" do
-    assert tokenize("x \"y\" 10") == {:ok, [%Token{lexeme: "x", line: 0, index: 0, value: :x},
-                                            %Token{lexeme: "\"y\"", line: 0, index: 2, value: "y"},
-                                            %Token{lexeme: "10", line: 0, index: 6, value: 10}]}
+  test "tokenizes into Expr structs" do
+    expected = [%Expr{lex: "x", line: 0, row: 0, val: :x, ctx: "x \"y\" 10"},
+                %Expr{lex: "\"y\"", line: 0, row: 2, val: "y", ctx: "x \"y\" 10"},
+                %Expr{lex: "10", line: 0, row: 6, val: 10, ctx: "x \"y\" 10"}]
+    assert tokenize("x \"y\" 10") == {:ok, expected}
   end
 
   test "ignore token and return error when invalid token" do
@@ -59,10 +60,10 @@ defmodule Sammal.TokenizerTest do
   end
 
   test "returns an error when odd number of quotes" do
-    assert {:error, %{type: :ending_quote}} = lexeme_to_value("\"xs")
-    assert {:error, %{type: :ending_quote}} = lexeme_to_value("\"xs ys")
-    assert {:error, %{type: :ending_quote}} = lexeme_to_value("\"xs\" ys")
-    assert {:error, %{type: :ending_quote}} = lexeme_to_value("\"xs\"x\" ys zs")
+    assert {:error, :ending_quote} = lexeme_to_value("\"xs")
+    assert {:error, :ending_quote} = lexeme_to_value("\"xs ys")
+    assert {:error, :ending_quote} = lexeme_to_value("\"xs\" ys")
+    assert {:error, :ending_quote} = lexeme_to_value("\"xs\"x\" ys zs")
   end
 
   test "tokenizes quotes" do
@@ -70,7 +71,5 @@ defmodule Sammal.TokenizerTest do
     assert lexemes("('x '(10)") == ["(", "'", "x", "'", "(", "10", ")"]
   end
 
-  defp lexeme_to_value(lexeme), do: token_to_value(%Token{lexeme: lexeme})
-
-  defp lexemes(line), do: line |> tokenize |> elem(1) |> Enum.map(&(&1.lexeme))
+  defp lexemes(line), do: line |> tokenize |> elem(1) |> Enum.map(&(&1.lex))
 end

@@ -2,77 +2,75 @@ defmodule Sammal.Tokenizer do
   @moduledoc """
   Tokenizer and various helper methods.
   """
-  alias Sammal.{SammalError, Token}
+  alias Sammal.{Expr, SammalError}
 
 
   @tokenizer_regex ~r/(['()]|"[^"]*"?|[\w-+\/.#]+)/
 
   @doc ~S"""
-  Split a line of raw input into a list of Token structs.
+  Split a line of raw input into a list of Node structs.
 
   ## Example
 
     iex> Sammal.Tokenizer.tokenize("(define x 10)")
-    {:ok, [%Sammal.Token{lexeme: "(", line: 0, index: 0, value: :"("},
-           %Sammal.Token{lexeme: "define", line: 0, index: 1, value: :define},
-           %Sammal.Token{lexeme: "x", line: 0, index: 8, value: :x},
-           %Sammal.Token{lexeme: "10", line: 0, index: 10, value: 10},
-           %Sammal.Token{lexeme: ")", line: 0, index: 12, value: :")"}]}
+    {:ok, [%Sammal.Expr{lex: "(", line: 0, row: 0, val: :"(", ctx: "(define x 10)"},
+           %Sammal.Expr{lex: "define", line: 0, row: 1, val: :define, ctx: "(define x 10)"},
+           %Sammal.Expr{lex: "x", line: 0, row: 8, val: :x, ctx: "(define x 10)"},
+           %Sammal.Expr{lex: "10", line: 0, row: 10, val: 10, ctx: "(define x 10)"},
+           %Sammal.Expr{lex: ")", line: 0, row: 12, val: :")", ctx: "(define x 10)"}]}
   """
-  def tokenize(line, row_index \\ 0)
-  def tokenize(";" <> _, row_index), do: {:ok, []}
-  def tokenize(line, row_index) do
-    try do
-      tokens =
-        @tokenizer_regex
-        |> Regex.scan(line, capture: :first, return: :index)
-        |> Enum.map(fn [{index, n}] ->
-          lexeme = String.slice(line, index, n)
-          token = %Token{index: index, lexeme: lexeme, line: row_index}
+  def tokenize(line, line_index \\ 0)
+  def tokenize(";" <> _, _), do: {:ok, []}
+  def tokenize(line, line_index) do
+    tokens =
+      @tokenizer_regex
+      |> Regex.scan(line, capture: :first, return: :index)
+      |> Enum.map(fn [{row, n}] ->
+        lex = String.slice(line, row, n)
+        token = %Expr{ctx: line, row: row, lex: lex, line: line_index}
 
-          case token_to_value(token) do
-            {:ok, value} -> %{token | value: value}
-            {:error, error} -> throw error
-          end
-        end)
+        case lexeme_to_value(lex) do
+          {:ok, val} -> %{token | val: val}
+          {:error, error} -> throw SammalError.new(error, token)
+        end
+      end)
 
-      {:ok, tokens}
-    catch
-      %SammalError{} = error -> {:error, error}
-    end
+    {:ok, tokens}
+  catch
+    %SammalError{} = error -> {:error, error}
   end
 
   @doc ~S"""
-  Given a token, returns a matching Elixir value (or an error).
+  Given a lexeme, return a matching Elixir value (or an error).
 
   ## Example
 
-    iex> Sammal.Tokenizer.token_to_value(%Sammal.Token{lexeme: "12"})
+    iex> Sammal.Tokenizer.lexeme_to_value("12")
     {:ok, 12}
 
-    iex> Sammal.Tokenizer.token_to_value(%Sammal.Token{lexeme: "12.12"})
+    iex> Sammal.Tokenizer.lexeme_to_value("12.12")
     {:ok, 12.12}
 
-    iex> Sammal.Tokenizer.token_to_value(%Sammal.Token{lexeme: "\"12\""})
+    iex> Sammal.Tokenizer.lexeme_to_value("\"12\"")
     {:ok, "12"}
   """
-  def token_to_value(%Token{lexeme: "#t"}), do: {:ok, true}
-  def token_to_value(%Token{lexeme: "#f"}), do: {:ok, false}
-  def token_to_value(%Token{lexeme: "\"" <> tail} = token) do
+  def lexeme_to_value("#t"), do: {:ok, true}
+  def lexeme_to_value("#f"), do: {:ok, false}
+  def lexeme_to_value("\"" <> tail) do
     if String.ends_with?(tail, "\"") do
       {:ok, String.slice(tail, 0..-2)}
     else
-      {:error, SammalError.new(:ending_quote, token)}
+      {:error, :ending_quote}
     end
   end
 
-  def token_to_value(%Token{lexeme: lexeme}) do
-    case Integer.parse(lexeme) do
+  def lexeme_to_value(lex) do
+    case Integer.parse(lex) do
       {val, ""} -> {:ok, val}
-      :error -> {:ok, String.to_atom(lexeme)}
-      {val, _} -> case Float.parse(lexeme) do
+      :error -> {:ok, String.to_atom(lex)}
+      {val, _} -> case Float.parse(lex) do
         {val, ""} -> {:ok, val}
-        _ -> {:ok, String.to_atom(lexeme)}
+        _ -> {:ok, String.to_atom(lex)}
       end
     end
   end
