@@ -4,7 +4,8 @@ defmodule Sammal.ParserTest do
 
   import Sammal.Parser
   import Sammal.Tokenizer, only: [tokenize: 1]
-  alias Sammal.{Expr, SammalError}
+  import Sammal.Utils, only: [map_deep: 2]
+  alias Sammal.{SammalError}
 
 
   test "parses atoms" do
@@ -16,6 +17,8 @@ defmodule Sammal.ParserTest do
     assert_parse "#f", [:false]
     assert_parse "somesymbol", [:"somesymbol"]
     assert_parse "a_messy-symbol", [:"a_messy-symbol"]
+    assert_parse "()", [[]]
+    assert_parse "  (     ) ", [[]]
   end
 
   test "parses a single expression" do
@@ -39,9 +42,9 @@ defmodule Sammal.ParserTest do
   end
 
   test "returns error when parsing invalid expressions" do
-    assert {:error, %SammalError{type: :unexpected_token}} = expr("x")
-    assert {:error, %SammalError{type: :unexpected_token}} = expr(")")
-    assert {:error, %SammalError{type: :unexpected_token}} = expr("x y)")
+    assert {:error, %SammalError{type: :unexpected}} = expr("x")
+    assert {:error, %SammalError{type: :unexpected}} = expr(")")
+    assert {:error, %SammalError{type: :unexpected}} = expr("x y)")
     assert {:error, %SammalError{type: :unmatched_paren}} = expr("(")
     assert {:error, %SammalError{type: :unmatched_paren}} = expr("(x")
     assert {:error, %SammalError{type: :unmatched_paren}} = expr("(x (y)")
@@ -53,8 +56,9 @@ defmodule Sammal.ParserTest do
 
   # Helpers:
 
-  defp assert_parse(line, ast) do
-    assert {:ok, {^ast, []}} = {[], line |> tokenize |> elem(1)} |> parse_next
+  defp assert_parse(raw, expr) do
+    assert {:ok, {ast, []}} = {[], raw |> tokenize |> elem(1)} |> parse_next
+    assert map_deep(ast, &(&1.val)) == expr
   end
   defp any(line), do: {[], line |> tokenize |> elem(1)} |> parse_next
   defp expr(line), do: {[], line |> tokenize |> elem(1)} |> parse_expression

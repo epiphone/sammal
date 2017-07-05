@@ -2,7 +2,7 @@ defmodule Sammal.SammalError do
   @moduledoc """
   An error struct and helpers for generating error messages with context.
   """
-  defstruct [:expected, :message, :expr, :type]
+  defexception [:expected, :message, :expr, :type]
 
   @doc """
   Construct an error struct.
@@ -12,7 +12,10 @@ defmodule Sammal.SammalError do
     message =
       case type do
         :ending_quote -> "Missing ending quote for #{expr_str}"
-        :unexpected_token -> "Unexpected expr #{expr_str} - expecting '#{expected}'"
+        :cannot_bind -> "Cannot bind in local scope: #{expr_str}"
+        :not_applicable -> "Expression #{expr_str} is not applicable - expecting a procedure"
+        :unexpected -> "Unexpected expression #{expr_str} - expecting '#{expected}'"
+        :unbound -> "Referring to an unbound variable #{expr_str}"
         :unmatched_paren -> "Unmatched open parenthesis #{expr_str}"
         _ -> "Invalid expr #{expr_str}"
       end
