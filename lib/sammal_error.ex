@@ -2,7 +2,8 @@ defmodule Sammal.SammalError do
   @moduledoc """
   An error struct and helpers for generating error messages with context.
   """
-  defexception [:expected, :message, :expr, :type]
+  defstruct [:expected, :message, :expr, :type]
+
 
   @doc """
   Construct an error struct.
