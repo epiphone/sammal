@@ -26,19 +26,18 @@ defmodule Sammal.ParserV2 do
   def token(value_or_predicate)
 
   def token(predicate) when is_function(predicate), do: fn
-    ([%Expr{val: val} = head | rest]) ->
+    ([%Expr{val: val} = head | rest] = input) ->
       if predicate.(val) do
         {:ok, {[head], rest}}
       else
-        {:error, {:unexpected, head, nil}}
+        {:error, input, nil}
       end
-    ([]) -> {:error, {:unexpected_eof, nil}}
+    ([]) -> {:error, [], nil}
   end
 
   def token(value), do: fn
     ([%Expr{val: ^value} = head | rest]) -> {:ok, {[head], rest}}
-    ([head | _]) -> {:error, {:unexpected, head, value}}
-    ([]) -> {:error, {:unexpected_eof, value}}
+    input -> {:error, input, value}
   end
 
   @doc "Parse a number."
@@ -58,11 +57,11 @@ defmodule Sammal.ParserV2 do
 
   @doc "Parse a primitive expression."
   @spec primitive :: parser
-  def primitive(), do: any([number, string, symbol])
+  def primitive(), do: describe(any([number, string, symbol]), "primitive")
 
   @doc "Parse an expression - either a form or a primitive."
   @spec expression :: parser
-  def expression(), do: any([quoted, form, primitive])
+  def expression(), do: describe(any([quoted, form, primitive]), "expression")
 
   @doc "Parse and extend a quoted expression."
   @spec quoted :: parser

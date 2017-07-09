@@ -8,7 +8,7 @@ defmodule Sammal.ParserCombinators do
   @type result :: {value :: [token], remaining :: [token]}
   @type error :: atom
 
-  @type parser :: ((input :: [token]) -> {:ok, result} | {:error, error})
+  @type parser :: ((input :: [token]) -> {:ok, result} | {:error, remaining :: [token]})
   @type transformer :: ([token] -> [token])
 
     # number   : /-?[0-9]+/ ;
@@ -19,8 +19,26 @@ defmodule Sammal.ParserCombinators do
   @spec symbol(String.t) :: parser
   def symbol(symbol), do: fn
     ([^symbol | rest]) -> {:ok, {[symbol], rest}}
-    ([head | _]) -> {:error, {:unexpected, head, symbol}}
-    ([]) -> {:error, {:unexpected_eof, symbol}}
+    input -> {:error, input, symbol}
+  end
+
+  def describe(parser, expected), do: fn (input) ->
+    case parser.(input) do
+      {:ok, value} ->
+        {:ok, value}
+      {:error, rem, _} when length(rem) == length(input) ->
+        {:error, input, expected}
+      {:error, rem, exp} ->
+        {:error, rem, {expected, [exp]}} # TODO always handle leaf nodes with root for context
+      {:error, errs} when is_list(errs) ->
+        {min_rem, _} = Enum.min_by(errs, fn ({rem, _}) -> length(rem) end)
+        leaf_exps =
+          errs
+          |> Enum.filter(fn ({rem, _}) -> length(rem) == length(min_rem) end)
+          |> Enum.map(fn ({_, exp}) -> exp end)
+
+        {:error, min_rem, {expected, leaf_exps}}
+    end
   end
 
   @spec both(parser, parser) :: parser
@@ -28,18 +46,11 @@ defmodule Sammal.ParserCombinators do
     with {:ok, {val_a, rest_a}} <- a.(input),
         {:ok, {val_b, rest_b}} <- b.(rest_a) do
       {:ok, {val_a ++ val_b, rest_b}}
-    else
-      {:error, error} -> {:error, error}
     end
   end
 
   @spec either(parser, parser) :: parser
-  def either(a, b), do: fn (input) ->
-    case a.(input) do
-      {:ok, val} -> {:ok, val}
-      _ -> b.(input)
-    end
-  end
+  def either(a, b), do: any([a, b])
 
   @spec many(parser) :: parser
   def many(parser), do: fn (input) -> _many(parser, [], input) end
@@ -48,7 +59,7 @@ defmodule Sammal.ParserCombinators do
     case parser.(input) do
       {:ok, {value, rest}} ->
         _many(parser, acc ++ value, rest)
-      {:error, _} ->
+      _err ->
         {:ok, {acc, input}}
     end
   end
@@ -56,19 +67,21 @@ defmodule Sammal.ParserCombinators do
   @spec skip(parser) :: parser
   def skip(parser), do: fn (input) ->
     case parser.(input) do
-      {:ok, {_, rest}} ->
-        {:ok, {[], rest}}
-      {:error, error} ->
-        {:error, error}
+      {:ok, {_, rest}} -> {:ok, {[], rest}}
+      err -> err
     end
   end
 
   @spec any([parser]) :: parser
-  def any([parser]), do: fn (input) -> parser.(input) end
-  def any([parser | rest]) when length(rest) > 0, do: fn (input) ->
+  def any([], errors), do: fn (_) -> {:error, errors} end
+  def any([parser | rest], errors \\ []), do: fn (input) ->
     case parser.(input) do
-      {:ok, val} -> {:ok, val}
-      {:error, _} -> any(rest).(input)
+      {:ok, val} ->
+        {:ok, val}
+      {:error, rem, exp} ->
+        any(rest, [{rem, exp} | errors]).(input)
+      # other ->
+      #   IO.inspect other, pretty: true, label: "OTHER"
     end
   end
 
@@ -78,14 +91,15 @@ defmodule Sammal.ParserCombinators do
     case stop.(input) do
       {:ok, _} ->
         {:ok, {acc, input}}
-      {:error, _} ->
+      _err ->
         case parser.(input) do
           {:ok, {value, rest}} ->
             _until(parser, stop, acc ++ value, rest)
-          {:error, error} ->
-            {:error, error}
+          err ->
+            err
         end
     end
+    # TODO return deepest err
   end
 
   @spec sequence([parser]) :: parser
@@ -97,8 +111,8 @@ defmodule Sammal.ParserCombinators do
     case parser.(input) do
       {:ok, {value, rest}} ->
         {:ok, {acc ++ value, rest}}
-      {:error, error} ->
-        {:error, error}
+      err ->
+        err
     end
   end
 
@@ -106,8 +120,8 @@ defmodule Sammal.ParserCombinators do
     case parser.(input) do
       {:ok, {value, rest}} ->
         _sequence(rem_parsers, acc ++ value, rest)
-      {:error, error} ->
-        {:error, error}
+      err ->
+        err
     end
   end
 
@@ -118,7 +132,7 @@ defmodule Sammal.ParserCombinators do
   @spec eof() :: parser
   def eof(), do: fn
     ([]) -> {:ok, {[], []}}
-    ([head | _]) -> {:error, {:eof, head}}
+    input -> {:error, input, []}
   end
 
   @spec transform(transformer, parser) :: parser
@@ -126,8 +140,8 @@ defmodule Sammal.ParserCombinators do
     case parser.(input) do
       {:ok, {value, rest}} ->
         {:ok, {f.(value), rest}}
-      {:error, error} ->
-        {:error, error}
+      err ->
+        err
     end
   end
 
@@ -147,7 +161,7 @@ defmodule Sammal.ParserCombinators do
   def required(parser), do: fn (input) ->
     case parser.(input) do
       {:ok, val} -> {:ok, val}
-      {:error, error} -> throw error
+      err -> throw err
     end
   end
 
@@ -165,12 +179,10 @@ defmodule Sammal.ParserCombinators do
   @spec expect(parser, expected :: any) :: parser
   def expect(parser, expected), do: fn (input) ->
     case parser.(input) do
-      {:error, {:unexpected, val, _}} ->
-        {:error, {:unexpected, val, expected}}
-      {:error, {:unexpected_eof, _}} ->
-        {:error, {:unexpected_eof, expected}}
-      other ->
-        other
+      {:error, remaining, _} ->
+        {:error, remaining, expected}
+      {:ok, value} ->
+        {:ok, value}
     end
   end
 
