@@ -5,6 +5,7 @@ defmodule Sammal.ParserV2Test do
 
   import Sammal.ParserV2
   import Sammal.ParserCombinators, only: [many: 1]
+  import Sammal.Utils, only: [map_deep: 2]
   alias Sammal.Expr
 
 
@@ -41,11 +42,48 @@ defmodule Sammal.ParserV2Test do
   end
 
   test "parses expressions" do
-    assert_parse [:"(", 10, :")"], expression, [10]
-    assert_parse [:"(", :define, :x, 10, :")"], expression, [:define, :x, 10]
-    assert_error [:"(", 10], expression
-    # TODO test more!!!
+    assert_parse [10], expression, [10]
+    assert_parse [10, :"(", :x, :")"], expression, [10], [:"(", :x, :")"]
+    assert_parse [:"(", 10, :")"], expression, [[10]]
+    assert_parse [:"(", :define, :x, 10, :")"], expression, [[:define, :x, 10]]
+    assert_parse ~w/( x ( y ) )/a, expression, [[:x, [:y]]]
   end
+
+  test "parses deeply nested expressions" do
+    assert_parse ~w/( x ( y ) )/a, expression, [[:x, [:y]]]
+    assert_parse ~w/( ( ( x ) ) ( y ) )/a, expression, [[[[:x]], [:y]]]
+    assert_parse ~w/( + ( - a b ) ( \/ c d ) )/a, expression, [[:+, [:-, :a, :b], [:/, :c, :d]]]
+    assert_parse ~w/( a ( b ( c ( d ) c ) b ) a )/a, expression, [[:a, [:b, [:c, [:d], :c], :b], :a]]
+  end
+
+  test "returns errors on invalid forms" do
+    assert_error ~w/( x/a, sammal
+    assert_error ~w/( x ( y )/a, sammal
+    assert_error ~w/x/a, sammal
+    assert_error ~w/( ) )/a, sammal
+    assert_error ~w/( x y ) )/a, sammal
+    assert_error ~w/( ( )/a, sammal
+    assert_error ~w/( ( x )/a, sammal
+    assert_error ~w/( ( x ( y ) )/a, sammal
+    assert_error ~w/( ( ( x ) )/a, sammal
+    assert_error ~w/( ' ( )/a, sammal
+    assert_error ~w/( ' ( x )/a, sammal
+  end
+
+  test "parses empty lists" do
+    assert_parse ~w/( )/a, expression, [[]]
+    assert_parse ~w/( ( ( ) ) )/a, expression, [[[[]]]]
+    assert_parse ~w/( def x ( ) )/a, expression, [[:def, :x, []]]
+  end
+
+  test "extends quoted expressions" do
+    assert_parse ~w/' x/a, expression, [[:quote, :x]]
+    assert_parse ~w/' ( x )/a, expression, [[:quote, [:x]]]
+    assert_parse ~w/( ' x y )/a, expression, [[[:quote, :x], :y]]
+    assert_parse ~w/' ( x y )/a, expression, [[:quote, [:x, :y]]]
+    assert_parse ~w/( ' x ' y )/a, expression, [[[:quote, :x], [:quote, :y]]]
+  end
+
 
   # Helpers to avoid boilerplate in tests:
 
@@ -62,5 +100,5 @@ defmodule Sammal.ParserV2Test do
     end
   end
 
-  defp tokens(vals), do: Enum.map(vals, &%Expr{val: &1})
+  defp tokens(vals), do: map_deep(vals, &%Expr{val: &1})
 end

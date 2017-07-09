@@ -8,7 +8,7 @@ defmodule Sammal.ParserCombinators do
   @type error :: atom
 
   @type parser :: ((input :: [token]) -> {:ok, result} | {:error, error})
-  @type transformer :: (result -> result)
+  @type transformer :: ([token] -> [token])
 
     # number   : /-?[0-9]+/ ;
     # operator : '+' | '-' | '*' | '/' ;
@@ -115,6 +115,12 @@ defmodule Sammal.ParserCombinators do
   @spec between(parser, parser, parser) :: parser
   def between(a, b, c), do: sequence([skip(a), b, skip(c)])
 
+  @spec eof() :: parser
+  def eof(), do: fn
+    ({val, []}) -> {:ok, {val, []}}
+    _ -> {:error, :eof}
+  end
+
   @spec transform(transformer, parser) :: parser
   def transform(f, parser), do: fn (input) ->
     case parser.(input) do
@@ -125,7 +131,7 @@ defmodule Sammal.ParserCombinators do
     end
   end
 
-  @moduledoc """
+  @doc """
   Delay parser evaluation to handle infinite loops in self-referential parsers.
   """
   @spec delay((() -> parser)) :: parser
@@ -133,4 +139,10 @@ defmodule Sammal.ParserCombinators do
     parser = parser_func.()
     parser.(input)
   end
+
+  @doc """
+  Wrap parser result into a list.
+  """
+  @spec wrap(parser) :: parser
+  def wrap(parser), do: transform(fn (val) -> [val] end, parser)
 end

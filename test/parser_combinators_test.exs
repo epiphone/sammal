@@ -130,4 +130,11 @@ defmodule Sammal.ParserCombinatorsTest do
     assert {:ok, {~w/x x/, ~w/y/}} = ~w/x y/ |> transform(duplicate, symbol("x")).()
     assert {:ok, {~w/X X X X/, []}} = ~w/x x/ |> transform(to_upper, transform(duplicate, many(symbol("x")))).()
   end
+
+  test "wraps parsers into nested lists" do
+    assert {:ok, {[["x"]], []}} = ~w/x/ |> wrap(symbol("x")).()
+
+    parser = many(any([symbol("x"), wrap(symbol("y"))]))
+    assert {:ok, {["x", ["y"], "x", ["y"], ["y"]], []}} = ~w/x y x y y/ |> parser.()
+  end
 end
