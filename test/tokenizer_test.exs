@@ -32,7 +32,7 @@ defmodule Sammal.TokenizerTest do
     assert lexemes("((()))") == ~w/( ( ( ) ) )/
   end
 
-  test "tokenizes strings with whitespace" do
+  test "tokenizes strings" do
     assert lexemes("\"asd\"") == ["\"asd\""]
     assert lexemes("\"asd dsa\"") == ["\"asd dsa\""]
     assert lexemes("(define x \"asd dsa\")") == ["(", "define", "x", "\"asd dsa\"", ")"]
@@ -52,18 +52,26 @@ defmodule Sammal.TokenizerTest do
   test "converts lexemes into matching data Elixir values" do
     assert lexeme_to_value("12") == {:ok, 12}
     assert lexeme_to_value("12.12") == {:ok, 12.12}
+    assert lexeme_to_value("+1") == {:ok, 1}
     assert lexeme_to_value("-10") == {:ok, -10}
-    assert lexeme_to_value("atom") == {:ok, :atom}
-    assert lexeme_to_value("\"not an atom\"") == {:ok, "not an atom"}
+    assert lexeme_to_value("some_symbol") == {:ok, :some_symbol}
+    assert lexeme_to_value("\"not a symbol\"") == {:ok, "not a symbol"}
     assert lexeme_to_value("#t") == {:ok, true}
     assert lexeme_to_value("#f") == {:ok, false}
   end
 
-  test "returns an error when odd number of quotes" do
+  test "returns error when quotes unmatched" do
     assert {:error, :ending_quote} = lexeme_to_value("\"xs")
     assert {:error, :ending_quote} = lexeme_to_value("\"xs ys")
     assert {:error, :ending_quote} = lexeme_to_value("\"xs\" ys")
     assert {:error, :ending_quote} = lexeme_to_value("\"xs\"x\" ys zs")
+  end
+
+  test "allows unusual symbols" do
+    assert lexeme_to_value("++1") == {:ok, :"++1"}
+    assert lexeme_to_value("...") == {:ok, :"..."}
+    assert lexeme_to_value("x1") == {:ok, :x1}
+    assert lexeme_to_value("10f") == {:ok, :"10f"}
   end
 
   test "tokenizes quotes" do
