@@ -69,6 +69,7 @@ defmodule Sammal.ParserCombinatorsTest do
 
     assert {:ok, {~w/x/, ~w/y z/}} = ~w/x y z/ |> many(any([symbol("x")])).()
     assert {:ok, {~w/x y/, ~w/z/}} = ~w/x y z/ |> many(any([symbol("x"), symbol("y")])).()
+    assert {:ok, {~w/x x x/, []}} = ~w/x x x/ |> many(any([symbol("x"), symbol("y"), symbol("z")])).()
     assert {:ok, {~w/x y z/, []}} = ~w/x y z/ |> many(any([symbol("x"), symbol("y"), symbol("z")])).()
     assert {:ok, {[], ~w/a/}} = ~w/a/ |> many(any([symbol("x"), symbol("y"), symbol("z")])).()
   end
@@ -117,5 +118,16 @@ defmodule Sammal.ParserCombinatorsTest do
     assert {:error, _} = ~w/( x y z/ |> parser.()
     assert {:error, _} = ~w/( x y a/ |> parser.()
     assert {:error, _} = ~w/( x y a )/ |> parser.()
+  end
+
+  test "transforms parsers" do
+    to_upper = fn (res) -> Enum.map(res, &String.upcase&1) end
+    assert {:ok, {~w/X/, []}} = ~w/x/ |> transform(to_upper, symbol("x")).()
+    assert {:error, _} = ~w/y x/ |> transform(to_upper, symbol("x")).()
+    assert {:ok, {~w/X X/, ~w/y/}} = ~w/x x y/ |> transform(to_upper, many(symbol("x"))).()
+
+    duplicate = fn (res) -> Enum.flat_map(res, &[&1, &1]) end
+    assert {:ok, {~w/x x/, ~w/y/}} = ~w/x y/ |> transform(duplicate, symbol("x")).()
+    assert {:ok, {~w/X X X X/, []}} = ~w/x x/ |> transform(to_upper, transform(duplicate, many(symbol("x")))).()
   end
 end

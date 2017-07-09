@@ -1,13 +1,14 @@
 defmodule Sammal.ParserCombinators do
   @moduledoc """
   Experimenting with parser combinators.
+  TODO docs
   """
-
-  @type token :: String.t
+  @type token :: any
   @type result :: {value :: [token], remaining :: [token]}
   @type error :: atom
 
   @type parser :: ((input :: [token]) -> {:ok, result} | {:error, error})
+  @type transformer :: (result -> result)
 
     # number   : /-?[0-9]+/ ;
     # operator : '+' | '-' | '*' | '/' ;
@@ -15,37 +16,32 @@ defmodule Sammal.ParserCombinators do
     # lispy    : /^/ <operator> <expr>+ /$/ ;
 
   @spec symbol(String.t) :: parser
-  def symbol(symbol) do
-    fn
-      ([^symbol | rest]) -> {:ok, {[symbol], rest}}
-      (_) -> {:error, :unexpected} # TODO: do errors need a type?
-    end
+  def symbol(symbol), do: fn
+    ([^symbol | rest]) -> {:ok, {[symbol], rest}}
+    (_) -> {:error, :unexpected} # TODO: do errors need a type?
   end
 
   @spec both(parser, parser) :: parser
-  def both(a, b) do
-    fn (input) ->
-      with {:ok, {val_a, rest_a}} <- a.(input),
-          {:ok, {val_b, rest_b}} <- b.(rest_a) do
-        {:ok, {val_a ++ val_b, rest_b}}
-      else
-        {:error, error} -> {:error, error}
-      end
+  def both(a, b), do: fn (input) ->
+    with {:ok, {val_a, rest_a}} <- a.(input),
+        {:ok, {val_b, rest_b}} <- b.(rest_a) do
+      {:ok, {val_a ++ val_b, rest_b}}
+    else
+      {:error, error} -> {:error, error}
     end
   end
 
   @spec either(parser, parser) :: parser
-  def either(a, b) do
-    fn (input) ->
-      case a.(input) do
-        {:ok, val} -> {:ok, val}
-        _ -> b.(input)
-      end
+  def either(a, b), do: fn (input) ->
+    case a.(input) do
+      {:ok, val} -> {:ok, val}
+      _ -> b.(input)
     end
   end
 
   @spec many(parser) :: parser
   def many(parser), do: fn (input) -> _many(parser, [], input) end
+  defp _many(parser, acc, []), do: {:ok, {acc, []}}
   defp _many(parser, acc, input) do
     case parser.(input) do
       {:ok, {value, rest}} ->
@@ -76,6 +72,7 @@ defmodule Sammal.ParserCombinators do
 
   @spec until(parser, parser) :: parser
   def until(parser, stop), do: fn (input) -> _until(parser, stop, [], input) end
+  defp _until(_, _, acc, []), do: {:error, :unexpected} # TODO handle eof?
   defp _until(parser, stop, acc, input) do
     case stop.(input) do
       {:ok, _} ->
@@ -94,6 +91,8 @@ defmodule Sammal.ParserCombinators do
   def sequence(parsers) when length(parsers) > 0, do: fn (input) ->
     _sequence(parsers, [], input)
   end
+
+  defp _sequence(_, _, []), do: {:error, :unexpected} # TODO handle eof?
 
   defp _sequence([parser], acc, input) do
     case parser.(input) do
@@ -115,4 +114,23 @@ defmodule Sammal.ParserCombinators do
 
   @spec between(parser, parser, parser) :: parser
   def between(a, b, c), do: sequence([skip(a), b, skip(c)])
+
+  @spec transform(transformer, parser) :: parser
+  def transform(f, parser), do: fn (input) ->
+    case parser.(input) do
+      {:ok, {value, rest}} ->
+        {:ok, {f.(value), rest}}
+      {:error, error} ->
+        {:error, error}
+    end
+  end
+
+  @moduledoc """
+  Delay parser evaluation to handle infinite loops in self-referential parsers.
+  """
+  @spec delay((() -> parser)) :: parser
+  def delay(parser_func), do: fn (input) ->
+    parser = parser_func.()
+    parser.(input)
+  end
 end
