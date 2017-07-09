@@ -59,7 +59,6 @@ defmodule Sammal.ParserV2Test do
   test "returns errors on invalid forms" do
     assert_error ~w/( x/a, sammal
     assert_error ~w/( x ( y )/a, sammal
-    assert_error ~w/x/a, sammal
     assert_error ~w/( ) )/a, sammal
     assert_error ~w/( x y ) )/a, sammal
     assert_error ~w/( ( )/a, sammal
@@ -84,6 +83,11 @@ defmodule Sammal.ParserV2Test do
     assert_parse ~w/( ' x ' y )/a, expression, [[[:quote, :x], [:quote, :y]]]
   end
 
+  test "parses combinations of compound and primitive expressions" do
+    assert_parse ~w/x ( y )/a, sammal, [:x, [:y]]
+    assert_parse ~w/( x ) y/a, sammal, [[:x], :y]
+    assert_parse ~w/x ( y z ) a ( ( b ) ) c/a, sammal, [:x, [:y, :z], :a, [[:b]], :c]
+  end
 
   # Helpers to avoid boilerplate in tests:
 

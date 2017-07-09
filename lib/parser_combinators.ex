@@ -117,7 +117,7 @@ defmodule Sammal.ParserCombinators do
 
   @spec eof() :: parser
   def eof(), do: fn
-    ({val, []}) -> {:ok, {val, []}}
+    ([]) -> {:ok, {[], []}}
     _ -> {:error, :eof}
   end
 

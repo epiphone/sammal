@@ -120,6 +120,13 @@ defmodule Sammal.ParserCombinatorsTest do
     assert {:error, _} = ~w/( x y a )/ |> parser.()
   end
 
+  test "parses EOF" do
+    assert {:ok, {[], []}} = [] |> eof.()
+    assert {:ok, {~w/x/, []}} = ~w/x/ |> both(symbol("x"), eof).()
+    assert {:error, :eof} = ~w/x/ |> eof.()
+    assert {:error, :eof} = ~w/x y/ |> both(symbol("x"), eof).()
+  end
+
   test "transforms parsers" do
     to_upper = fn (res) -> Enum.map(res, &String.upcase&1) end
     assert {:ok, {~w/X/, []}} = ~w/x/ |> transform(to_upper, symbol("x")).()
