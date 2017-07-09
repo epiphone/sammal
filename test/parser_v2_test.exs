@@ -12,20 +12,20 @@ defmodule Sammal.ParserV2Test do
   test "parses numbers" do
     assert_parse [1], number, [1]
     assert_parse [1.2, 14], number, [1.2], [14]
-    assert_error ["12"], number
     assert_parse [1, 2, :third], many(number), [1, 2], [:third]
+    assert {:error, {:unexpected, %Expr{val: "12"}, "a number"}} = ~w/12/ |> tokens |> number.()
   end
 
   test "parses strings" do
     assert_parse ["x"], string, ["x"]
     assert_parse ["var", "define"], string, ["var"], ["define"]
-    assert_error [12], string, :unexpected
+    assert_error [12], string
   end
 
   test "parses symbols" do
     assert_parse [:symbol], symbol, [:symbol]
     assert_parse [:var, :define], symbol, [:var], [:define]
-    assert_error ["symbol"], symbol, :unexpected
+    assert_error ["symbol"], symbol
   end
 
   test "parses specific tokens" do
@@ -57,9 +57,10 @@ defmodule Sammal.ParserV2Test do
   end
 
   test "returns errors on invalid forms" do
-    assert_error ~w/( x/a, sammal
+    assert {:error, {:unexpected_eof, %Expr{val: :")"}}} = ~w/( x/a |> tokens |> sammal.()
     assert_error ~w/( x ( y )/a, sammal
     assert_error ~w/( ) )/a, sammal
+    assert_error ~w/( x ( )/a, sammal
     assert_error ~w/( x y ) )/a, sammal
     assert_error ~w/( ( )/a, sammal
     assert_error ~w/( ( x )/a, sammal

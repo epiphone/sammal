@@ -133,6 +133,17 @@ defmodule Sammal.ParserCombinatorsTest do
     assert {:unexpected, "y", "x"} = catch_throw(~w/y/ |> required(symbol("x")).())
   end
 
+  test "overrides parser's expected value" do
+    parser = symbol("x")
+    assert {:error, {:unexpected, "y", "x"}} = parser.(["y"])
+    assert {:error, {:unexpected, "y", 10}} = expect(parser, 10).(["y"])
+    assert {:error, {:unexpected_eof, :xxx}} = expect(parser, :xxx).([])
+
+    parser = any([symbol("a"), symbol("b"), symbol("c")])
+    assert {:error, {:unexpected, "x", "c"}} = parser.(["x"])
+    assert {:error, {:unexpected, "x", "a, b, or c"}} = expect(parser, "a, b, or c").(["x"])
+  end
+
   test "transforms parsers" do
     to_upper = fn (res) -> Enum.map(res, &String.upcase&1) end
     assert {:ok, {~w/X/, []}} = ~w/x/ |> transform(to_upper, symbol("x")).()

@@ -17,43 +17,44 @@ defmodule Sammal.ParserV2 do
 
 
   @type result :: {value :: [Expr], remaining :: [Expr]}
-  @type error :: atom
+  @type error :: {label :: atom, context :: Expr} | {:eof, nil}
   @type parser :: (input :: [Expr] -> {:ok, result} | {:error, error})
 
 
-  @doc "Parse a `Sammal.Expr` struct that matches a given value or predicate."
-  @spec token(any | (any -> boolean), error) :: parser
-  def token(value_or_predicate, error \\ :unexpected)
+  @doc "Parse a `Sammal.Expr` struct that matches given value or predicate."
+  @spec token(any | (any -> boolean)) :: parser
+  def token(value_or_predicate)
 
-  def token(predicate, error) when is_function(predicate) do
-    fn ([%Expr{val: val} = head | rest]) ->
+  def token(predicate) when is_function(predicate), do: fn
+    ([%Expr{val: val} = head | rest]) ->
       if predicate.(val) do
         {:ok, {[head], rest}}
       else
-        {:error, error}
+        {:error, {:unexpected, head, nil}}
       end
-    end
+    ([]) -> {:error, {:unexpected_eof, nil}}
   end
 
-  def token(value, error), do: fn
+  def token(value), do: fn
     ([%Expr{val: ^value} = head | rest]) -> {:ok, {[head], rest}}
-    (_) -> {:error, error}
+    ([head | _]) -> {:error, {:unexpected, head, value}}
+    ([]) -> {:error, {:unexpected_eof, value}}
   end
 
   @doc "Parse a number."
   @spec number :: parser
-  def number(), do: token(&is_number/1)
+  def number(), do: expect(token(&is_number/1), "a number")
 
   @doc "Parse a string."
   @spec string :: parser
-  def string(), do: token(&is_binary/1)
+  def string(), do: expect(token(&is_binary/1), "a string")
 
   @doc "Parse a symbol."
   @spec symbol :: parser
-  def symbol(), do: token(fn
+  def symbol(), do: expect(token(fn
     (val) when val in [:"(", :")"] -> false
     (val) -> is_atom(val)
-  end)
+  end), "a symbol")
 
   @doc "Parse a primitive expression."
   @spec primitive :: parser
@@ -77,5 +78,7 @@ defmodule Sammal.ParserV2 do
 
   @doc "Parse a Sammal program."
   @spec sammal :: parser
-  def sammal(), do: both(many(expression), eof)
+  # def sammal(), do: both(many(expression), eof)
+  def sammal(), do: until(expression, eof)
+  # def sammal(), do: many(required(expression))
 end

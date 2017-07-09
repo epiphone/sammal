@@ -152,6 +152,29 @@ defmodule Sammal.ParserCombinators do
   end
 
   @doc """
+  Override parser's expected value that is shown in parse errors.
+
+  ## Examples
+
+      iex> parser = Sammal.ParserCombinators.symbol("x")
+      iex> parser.(["y"])
+      {:error, {:unexpected, "y", "x"}}
+      iex> Sammal.ParserCombinators.expect(parser, "something else").(["y"])
+      {:error, {:unexpected, "y", "something else"}}
+  """
+  @spec expect(parser, expected :: any) :: parser
+  def expect(parser, expected), do: fn (input) ->
+    case parser.(input) do
+      {:error, {:unexpected, val, _}} ->
+        {:error, {:unexpected, val, expected}}
+      {:error, {:unexpected_eof, _}} ->
+        {:error, {:unexpected_eof, expected}}
+      other ->
+        other
+    end
+  end
+
+  @doc """
   Wrap parser result into a list.
   """
   @spec wrap(parser) :: parser
