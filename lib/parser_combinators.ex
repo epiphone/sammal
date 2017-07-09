@@ -2,6 +2,7 @@ defmodule Sammal.ParserCombinators do
   @moduledoc """
   Experimenting with parser combinators.
   TODO docs
+  TODO handle errors: :eof/1, :unexpected/2, :unexpected_eof/1
   """
   @type token :: any
   @type result :: {value :: [token], remaining :: [token]}
@@ -18,7 +19,8 @@ defmodule Sammal.ParserCombinators do
   @spec symbol(String.t) :: parser
   def symbol(symbol), do: fn
     ([^symbol | rest]) -> {:ok, {[symbol], rest}}
-    (_) -> {:error, :unexpected} # TODO: do errors need a type?
+    ([head | _]) -> {:error, {:unexpected, head, symbol}}
+    ([]) -> {:error, {:unexpected_eof, symbol}}
   end
 
   @spec both(parser, parser) :: parser
@@ -72,7 +74,6 @@ defmodule Sammal.ParserCombinators do
 
   @spec until(parser, parser) :: parser
   def until(parser, stop), do: fn (input) -> _until(parser, stop, [], input) end
-  defp _until(_, _, acc, []), do: {:error, :unexpected} # TODO handle eof?
   defp _until(parser, stop, acc, input) do
     case stop.(input) do
       {:ok, _} ->
@@ -91,8 +92,6 @@ defmodule Sammal.ParserCombinators do
   def sequence(parsers) when length(parsers) > 0, do: fn (input) ->
     _sequence(parsers, [], input)
   end
-
-  defp _sequence(_, _, []), do: {:error, :unexpected} # TODO handle eof?
 
   defp _sequence([parser], acc, input) do
     case parser.(input) do
@@ -115,10 +114,11 @@ defmodule Sammal.ParserCombinators do
   @spec between(parser, parser, parser) :: parser
   def between(a, b, c), do: sequence([skip(a), b, skip(c)])
 
+  @doc "Parse end of file."
   @spec eof() :: parser
   def eof(), do: fn
     ([]) -> {:ok, {[], []}}
-    _ -> {:error, :eof}
+    ([head | _]) -> {:error, {:eof, head}}
   end
 
   @spec transform(transformer, parser) :: parser
@@ -132,12 +132,23 @@ defmodule Sammal.ParserCombinators do
   end
 
   @doc """
-  Delay parser evaluation to handle infinite loops in self-referential parsers.
+  Delay parser evaluation to prevent infinite loops in self-referential parsers.
   """
   @spec delay((() -> parser)) :: parser
   def delay(parser_func), do: fn (input) ->
     parser = parser_func.()
     parser.(input)
+  end
+
+  @doc """
+  Turn parser failure into a fatal exception.
+  """
+  @spec required(parser) :: parser
+  def required(parser), do: fn (input) ->
+    case parser.(input) do
+      {:ok, val} -> {:ok, val}
+      {:error, error} -> throw error
+    end
   end
 
   @doc """
