@@ -1,0 +1,608 @@
+    <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="ExDoc v0.16.2">
+    <title>Sammal.ParserV2 – Sammal v0.1.0</title>
+    <link rel="stylesheet" href="dist/app-268c9dc719.css" />
+    
+      <link rel="canonical" href="https://hexdocs.pm/sammal/Sammal.ParserV2.html" />
+    
+    <script src="dist/sidebar_items-0c6732b41e.js"></script>
+  </head>
+  <body data-type="modules">
+    <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
+
+    <div class="main">
+<button class="sidebar-toggle">
+  <span class="icon-menu" aria-hidden="true"></span>
+  <span class="sr-only">Toggle Sidebar</span>
+</button>
+<section class="sidebar">
+
+  
+  <a href="https://github.com/epiphone/sammal/" class="sidebar-projectLink">
+    <div class="sidebar-projectDetails">
+      <h1 class="sidebar-projectName">
+        Sammal
+      </h1>
+      <h2 class="sidebar-projectVersion">
+        v0.1.0
+      </h2>
+    </div>
+    
+  </a>
+
+  <div class="sidebar-search">
+    <span class="icon-search" aria-hidden="true"></span>
+    <input type="text" class="sidebar-searchInput" placeholder="search" aria-label="Search" autocomplete="off" />
+  </div>
+
+  <ul class="sidebar-listNav">
+    <li><a id="extras-list" href="#full-list">Pages</a></li>
+
+    
+      <li><a id="modules-list" href="#full-list">Modules</a></li>
+    
+
+    
+
+    
+
+    
+  </ul>
+  <div class="gradient"></div>
+  <ul id="full-list" class="sidebar-fullList"></ul>
+</section>
+
+<section class="content">
+  <div class="content-outer">
+    <div id="content" class="content-inner">
+
+
+      <h1>
+        <small class="visible-xs">Sammal v0.1.0</small>
+        Sammal.ParserV2
+        
+          <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L1" title="View Source" class="view-source" rel="help">
+            <span class="icon-code" aria-hidden="true"></span>
+            <span class="sr-only">View Source</span>
+          </a>
+        
+      </h1>
+
+      
+        <section id="moduledoc">
+          <p>A parser for Sammal based on parser combinators.</p>
+<h2 id="module-grammar" class="section-heading">
+  <a href="#module-grammar" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Grammar
+</h2>
+
+<pre><code class="elixir">primitive   : number | symbol | string
+form:       : ( expression* )
+expression  : quoted | primitive | form
+quoted      : &#39; expression
+sammal      : expression+</code></pre>
+
+        </section>
+      
+
+      
+        <section id="summary" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#summary">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Summary
+          </h1>
+          
+  <div class="summary-types summary">
+    <h2>
+      <a href="#types">Types</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:error/0">error()</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:parser/0">parser()</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:result/0">result()</a>
+  </div>
+  
+</div>
+
+  </div>
+
+
+          
+  <div class="summary-functions summary">
+    <h2>
+      <a href="#functions">Functions</a>
+    </h2>
+    <div class="summary-row">
+  <div class="summary-signature">
+    <a href="#expression/0">expression()</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Parse an expression - either a form or a primitive</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#form/0">form()</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Parse parenthesis-enclosed forms</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#number/0">number()</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Parse a number</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#primitive/0">primitive()</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Parse a primitive expression</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#quoted/0">quoted()</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Parse and extend a quoted expression</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#sammal/0">sammal()</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Parse a Sammal program</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#string/0">string()</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Parse a string</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#symbol/0">symbol()</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Parse a symbol</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#token/2">token(value_or_predicate, error \\ :unexpected)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Parse a <a href="Sammal.Expr.html"><code class="inline">Sammal.Expr</code></a> struct that matches a given value or predicate</p>
+</div>
+  
+</div>
+
+  </div>
+
+
+          
+
+        </section>
+      
+
+      
+        <section id="types" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#types">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Types
+          </h1>
+          <div class="types-list">
+            <div class="detail" id="t:error/0">
+  
+  <div class="detail-header">
+    <a href="#t:error/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <span class="signature">error()</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L20" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>error() :: atom</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+<div class="detail" id="t:parser/0">
+  
+  <div class="detail-header">
+    <a href="#t:parser/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <span class="signature">parser()</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L21" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>parser() :: (input :: [Sammal.Expr] -> {:ok, <a href="#t:result/0">result</a>} | {:error, <a href="#t:error/0">error</a>})</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+<div class="detail" id="t:result/0">
+  
+  <div class="detail-header">
+    <a href="#t:result/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <span class="signature">result()</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L19" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>result() :: {value :: [Sammal.Expr], remaining :: [Sammal.Expr]}</pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+
+          </div>
+        </section>
+      
+
+      
+        <section id="functions" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#functions">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+            Functions
+          </h1>
+          <div class="detail" id="expression/0">
+  
+  <div class="detail-header">
+    <a href="#expression/0" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">expression()</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L64" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>expression() :: <a href="#t:parser/0">parser</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Parse an expression - either a form or a primitive.</p>
+
+  </section>
+</div>
+<div class="detail" id="form/0">
+  
+  <div class="detail-header">
+    <a href="#form/0" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">form()</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L76" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>form() :: <a href="#t:parser/0">parser</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Parse parenthesis-enclosed forms.</p>
+
+  </section>
+</div>
+<div class="detail" id="number/0">
+  
+  <div class="detail-header">
+    <a href="#number/0" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">number()</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L45" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>number() :: <a href="#t:parser/0">parser</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Parse a number.</p>
+
+  </section>
+</div>
+<div class="detail" id="primitive/0">
+  
+  <div class="detail-header">
+    <a href="#primitive/0" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">primitive()</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L60" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>primitive() :: <a href="#t:parser/0">parser</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Parse a primitive expression.</p>
+
+  </section>
+</div>
+<div class="detail" id="quoted/0">
+  
+  <div class="detail-header">
+    <a href="#quoted/0" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">quoted()</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L68" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>quoted() :: <a href="#t:parser/0">parser</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Parse and extend a quoted expression.</p>
+
+  </section>
+</div>
+<div class="detail" id="sammal/0">
+  
+  <div class="detail-header">
+    <a href="#sammal/0" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">sammal()</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L80" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>sammal() :: <a href="#t:parser/0">parser</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Parse a Sammal program.</p>
+
+  </section>
+</div>
+<div class="detail" id="string/0">
+  
+  <div class="detail-header">
+    <a href="#string/0" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">string()</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L49" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>string() :: <a href="#t:parser/0">parser</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Parse a string.</p>
+
+  </section>
+</div>
+<div class="detail" id="symbol/0">
+  
+  <div class="detail-header">
+    <a href="#symbol/0" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">symbol()</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L53" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>symbol() :: <a href="#t:parser/0">parser</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Parse a symbol.</p>
+
+  </section>
+</div>
+<div class="detail" id="token/2">
+  
+    <span id="token/1"></span>
+  
+  <div class="detail-header">
+    <a href="#token/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">token(value_or_predicate, error \\ :unexpected)</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L26" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>token(any | (any -> boolean), <a href="#t:error/0">error</a>) :: <a href="#t:parser/0">parser</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Parse a <a href="Sammal.Expr.html"><code class="inline">Sammal.Expr</code></a> struct that matches a given value or predicate.</p>
+
+  </section>
+</div>
+
+        </section>
+      
+
+      
+          <footer class="footer">
+        <p>
+          <span class="line">
+            Built using
+            <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" rel="help" target="_blank">ExDoc</a> (v0.16.2),
+          </span>
+          <span class="line">
+            designed by
+            <a href="https://twitter.com/dignifiedquire" target="_blank" title="@dignifiedquire">Friedel Ziegelmayer</a>.
+            </span>
+        </p>
+        <button class="night-mode-toggle"><span class="sr-only">Switch theme</span></button>
+      </footer>
+    </div>
+  </div>
+</section>
+</div>
+  <script src="dist/app-4988ddd06b.js"></script>
+  </body>
+</html>
+

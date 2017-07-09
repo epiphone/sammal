@@ -11,8 +11,16 @@ defmodule Sammal.Mixfile do
      deps: deps(),
      dialyzer: [
        flags: ["-Wunmatched_returns", :error_handling, :race_conditions, :underspecs]
-     ]
-    ]
+     ],
+     package: [
+       description: "A compiler for a Scheme-ish language (coursework)",
+       licenses: ["MIT"],
+       links: %{source: "https://github.com/epiphone/sammal/"},
+       maintainers: ["aleksipekkala@hotmail.com"]
+     ],
+     name: "Sammal",
+     source_url: "https://github.com/epiphone/sammal/",
+     homepage_url: "https://github.com/epiphone/sammal/"]
   end
 
   # Configuration for the OTP application
@@ -35,6 +43,7 @@ defmodule Sammal.Mixfile do
   defp deps do
     [{:credo, "~> 0.8", only: [:dev, :test], runtime: false},
      {:mix_test_watch, "~> 0.3", only: :dev, runtime: false},
-     {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false}]
+     {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
+     {:ex_doc, "~> 0.14", only: :dev, runtime: false}]
   end
 end

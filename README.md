@@ -1,6 +1,10 @@
 # sammal
 
-A toy Lisp interpreter for a compilers class.
+Interpreter for a Scheme-ish language.
+
+## Docs
+
+https://hexdocs.pm/sammal/
 
 ## Dependencies
 
