@@ -172,13 +172,15 @@ defmodule Sammal.ParserCombinators do
 
       iex> parser = Sammal.ParserCombinators.symbol("x")
       iex> parser.(["y"])
-      {:error, {:unexpected, "y", "x"}}
+      {:error, ["y"], "x"}
       iex> Sammal.ParserCombinators.expect(parser, "something else").(["y"])
-      {:error, {:unexpected, "y", "something else"}}
+      {:error, ["y"], "something else"}
   """
   @spec expect(parser, expected :: any) :: parser
   def expect(parser, expected), do: fn (input) ->
     case parser.(input) do
+      {:error, errors} when is_list(errors) -> # TODO handle better
+        {:error, (for {rem, _} <- errors, do: {rem, expected})}
       {:error, remaining, _} ->
         {:error, remaining, expected}
       {:ok, value} ->
