@@ -1,8 +1,7 @@
 defmodule Sammal.ParserCombinators do
   @moduledoc """
-  Experimenting with parser combinators.
-  TODO docs
-  TODO handle errors: :eof/1, :unexpected/2, :unexpected_eof/1
+  Basic parser combinators to be used as building blocks for parsing more
+  complex grammars.
   """
   @type token :: any
   @type result :: {value :: [token], remaining :: [token]}
@@ -27,7 +26,7 @@ defmodule Sammal.ParserCombinators do
       {:ok, value} ->
         {:ok, value}
       {:error, rem, _} when length(rem) == length(input) ->
-        {:error, input, expected}
+        {:error, rem, expected}
       {:error, rem, exp} ->
         {:error, rem, {expected, [exp]}} # TODO always handle leaf nodes with root for context
       {:error, errs} when is_list(errs) ->
@@ -42,12 +41,7 @@ defmodule Sammal.ParserCombinators do
   end
 
   @spec both(parser, parser) :: parser
-  def both(a, b), do: fn (input) ->
-    with {:ok, {val_a, rest_a}} <- a.(input),
-        {:ok, {val_b, rest_b}} <- b.(rest_a) do
-      {:ok, {val_a ++ val_b, rest_b}}
-    end
-  end
+  def both(a, b), do: sequence([a, b])
 
   @spec either(parser, parser) :: parser
   def either(a, b), do: any([a, b])
@@ -63,6 +57,9 @@ defmodule Sammal.ParserCombinators do
         {:ok, {acc, input}}
     end
   end
+
+  @spec many1(parser) :: parser
+  def many1(parser), do: both(parser, many(parser))
 
   @spec skip(parser) :: parser
   def skip(parser), do: fn (input) ->
@@ -80,8 +77,6 @@ defmodule Sammal.ParserCombinators do
         {:ok, val}
       {:error, rem, exp} ->
         any(rest, [{rem, exp} | errors]).(input)
-      # other ->
-      #   IO.inspect other, pretty: true, label: "OTHER"
     end
   end
 
@@ -128,7 +123,9 @@ defmodule Sammal.ParserCombinators do
   @spec between(parser, parser, parser) :: parser
   def between(a, b, c), do: sequence([skip(a), b, skip(c)])
 
-  @doc "Parse end of file."
+  @doc """
+  Parse end of file.
+  """
   @spec eof() :: parser
   def eof(), do: fn
     ([]) -> {:ok, {[], []}}

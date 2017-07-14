@@ -53,6 +53,12 @@ defmodule Sammal.ParserCombinatorsTest do
     assert {:ok, {~w/1 1 0/, ~w/2 3/}} = ~w/1 1 0 2 3/ |> many(binary).()
   end
 
+  test "parser many1" do
+    assert {:error, [], "a"} = ~w// |> many1(symbol("a")).()
+    assert {:ok, {~w/a/, []}} = ~w/a/ |> many1(symbol("a")).()
+    assert {:ok, {~w/a a/, ~w/b/}} = ~w/a a b/ |> many1(symbol("a")).()
+  end
+
   test "parses skip" do
     assert {:ok, {[], ~w/y z/}} = ~w/x y z/ |> skip(symbol("x")).()
     assert {:ok, {[], ~w/x x/}} = ~w/x x x/ |> skip(symbol("x")).()
