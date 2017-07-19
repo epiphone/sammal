@@ -4,6 +4,7 @@ defmodule Sammal.ParserCombinatorsTest do
   doctest Sammal.ParserCombinators
 
   import Sammal.ParserCombinators
+  alias Sammal.ParserCombinators
 
 
   test "parses symbols" do
@@ -139,15 +140,15 @@ defmodule Sammal.ParserCombinatorsTest do
     assert {:error, ~w/y/, "x"} = catch_throw(~w/y/ |> required(symbol("x")).())
   end
 
-  test "overrides parser's expected value" do
+  test "describe parser overrides inner parser's expected value" do
     parser = symbol("x")
     assert {:error, ~w/y/, "x"} = parser.(["y"])
-    assert {:error, ~w/y/, "looking for y!"} = expect(parser, "looking for y!").(["y"])
-    assert {:error, [], :xxx} = expect(parser, :xxx).([])
+    assert {:error, ~w/y/, "looking for x!"} = ParserCombinators.describe(parser, "looking for x!").(["y"])
+    assert {:error, [], :xxx} = ParserCombinators.describe(parser, :xxx).([])
 
     parser = any([symbol("a"), symbol("b"), symbol("c")])
     assert {:error, _} = parser.(["x"])
-    assert {:error, _} = expect(parser, "a, b, or c").(["x"])
+    assert {:error, ~w/x/, _} = ParserCombinators.describe(parser, "a, b, or c").(["x"])
   end
 
   test "transforms parsers" do
@@ -166,5 +167,22 @@ defmodule Sammal.ParserCombinatorsTest do
 
     parser = many(any([symbol("x"), wrap(symbol("y"))]))
     assert {:ok, {["x", ["y"], "x", ["y"], ["y"]], []}} = ~w/x y x y y/ |> parser.()
+  end
+
+  test "handles ambiguity in optional parsers" do
+    # parser = either(
+    #   # if X then
+    #   # if X then Y else Z
+    #   sequence([symbol("x"), both(symbol("y"), symbol("z"))]),
+    #   sequence([both(symbol("x"), symbol("y")), symbol("z")])
+    # )
+    # Elixir can't handle self-refential anonymous functions so we have to pass the function itself as an argument:
+    parser = fn (self) -> any([
+      sequence([symbol("if"), symbol("..."), self]),
+      sequence([symbol("if"), symbol("..."), self, symbol("else"), self]),
+      symbol("x=10")
+    ]) end
+
+    assert {:ok, {~w/x y z/, []}} = ~w/if ... if ... x=10 else x=10/ |> parser.(parser).()
   end
 end

@@ -21,6 +21,18 @@ defmodule Sammal.ParserCombinators do
     input -> {:error, input, symbol}
   end
 
+  @doc """
+  Override parser's expected value that is shown in parse errors.
+
+  ## Examples
+
+      iex> parser = Sammal.ParserCombinators.symbol("x")
+      iex> parser.(["y"])
+      {:error, ["y"], "x"}
+      iex> Sammal.ParserCombinators.describe(parser, "something else").(["y"])
+      {:error, ["y"], "something else"}
+  """
+  @spec describe(parser, any) :: parser
   def describe(parser, expected), do: fn (input) ->
     case parser.(input) do
       {:ok, value} ->
@@ -79,6 +91,15 @@ defmodule Sammal.ParserCombinators do
         any(rest, [{rem, exp} | errors]).(input)
     end
   end
+    # TODO warn about ambiguity or memoize? (profile)
+    # case parser.(input) do
+    #   {:ok, val} ->
+    #     {:ok, val}
+    #   {:error, rem, exp} ->
+    #     any(rest, [{rem, exp} | errors]).(input)
+    # end
+  # end
+
 
   @spec until(parser, parser) :: parser
   def until(parser, stop), do: fn (input) -> _until(parser, stop, [], input) end
@@ -159,29 +180,6 @@ defmodule Sammal.ParserCombinators do
     case parser.(input) do
       {:ok, val} -> {:ok, val}
       err -> throw err
-    end
-  end
-
-  @doc """
-  Override parser's expected value that is shown in parse errors.
-
-  ## Examples
-
-      iex> parser = Sammal.ParserCombinators.symbol("x")
-      iex> parser.(["y"])
-      {:error, ["y"], "x"}
-      iex> Sammal.ParserCombinators.expect(parser, "something else").(["y"])
-      {:error, ["y"], "something else"}
-  """
-  @spec expect(parser, expected :: any) :: parser
-  def expect(parser, expected), do: fn (input) ->
-    case parser.(input) do
-      {:error, errors} when is_list(errors) -> # TODO handle better
-        {:error, (for {rem, _} <- errors, do: {rem, expected})}
-      {:error, remaining, _} ->
-        {:error, remaining, expected}
-      {:ok, value} ->
-        {:ok, value}
     end
   end
 

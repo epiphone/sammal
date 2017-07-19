@@ -4,6 +4,7 @@ defmodule Sammal.ParserV2 do
 
   ## Grammar
 
+  TODO http://www.scheme.com/tspl2d/grammar.html
   ```
   primitive   : number | symbol | string
   form:       : ( expression* )
@@ -42,15 +43,15 @@ defmodule Sammal.ParserV2 do
 
   @doc "Parse a number."
   @spec number :: parser
-  def number(), do: expect(token(&is_number/1), "a number")
+  def number(), do: describe(token(&is_number/1), "a number")
 
   @doc "Parse a string."
   @spec string :: parser
-  def string(), do: expect(token(&is_binary/1), "a string")
+  def string(), do: describe(token(&is_binary/1), "a string")
 
   @doc "Parse a symbol."
   @spec symbol :: parser
-  def symbol(), do: expect(token(fn
+  def symbol(), do: describe(token(fn
     (val) when val in [:"(", :")"] -> false
     (val) -> is_atom(val)
   end), "a symbol")

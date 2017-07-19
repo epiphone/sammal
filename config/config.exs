@@ -7,7 +7,7 @@ if Mix.env == :dev do
   config :mix_test_watch,
     tasks: [
       "test",
-      "dialyzer"
+      # "dialyzer"
       # "credo list --format oneline --strict"
     ]
 end
