@@ -13,7 +13,7 @@ defmodule Sammal.ParserV2 do
   sammal      : expression+
   ```
   """
-  import Sammal.ParserCombinators
+  import Sammal.ParserCombinators, except: [number: 0]
   alias Sammal.Expr
 
 

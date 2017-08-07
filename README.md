@@ -8,7 +8,7 @@ https://hexdocs.pm/sammal/
 
 ## Dependencies
 
-- [Elixir 1.4](http://elixir-lang.org/install.html)
+- [Elixir >= 1.4](http://elixir-lang.org/install.html)
 
 ## Build
 

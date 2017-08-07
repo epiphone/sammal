@@ -1,7 +1,8 @@
 defmodule Sammal.ParserCombinators do
   @moduledoc """
-  Basic parser combinators to be used as building blocks for parsing more
-  complex grammars.
+  Basic parser combinator building blocks.
+
+  Use these to compose your own grammar.
   """
   @type token :: any
   @type result :: {value :: [token], remaining :: [token]}
@@ -15,18 +16,29 @@ defmodule Sammal.ParserCombinators do
     # expr     : <number> | '(' <operator> <expr>+ ')' ;
     # lispy    : /^/ <operator> <expr>+ /$/ ;
 
-  @spec symbol(String.t) :: parser
-  def symbol(symbol), do: fn
-    ([^symbol | rest]) -> {:ok, {[symbol], rest}}
-    input -> {:error, input, symbol}
+  @doc """
+  Parse given string.
+  """
+  @spec string(String.t) :: parser
+  def string(string), do: fn
+    ([^string | rest]) -> {:ok, {[string], rest}}
+    input -> {:error, input, string}
   end
+
+  @spec number() :: parser
+  def number(), do: fn
+    ([head | rest]) when is_number(head) -> {:ok, {[head], rest}}
+    input -> {:error, input, "a number"}
+  end
+
+  # TODO regexp parser
 
   @doc """
   Override parser's expected value that is shown in parse errors.
 
   ## Examples
 
-      iex> parser = Sammal.ParserCombinators.symbol("x")
+      iex> parser = Sammal.ParserCombinators.string("x")
       iex> parser.(["y"])
       {:error, ["y"], "x"}
       iex> Sammal.ParserCombinators.describe(parser, "something else").(["y"])
@@ -92,6 +104,7 @@ defmodule Sammal.ParserCombinators do
     end
   end
     # TODO warn about ambiguity or memoize? (profile)
+    # TODO parallelize?
     # case parser.(input) do
     #   {:ok, val} ->
     #     {:ok, val}
@@ -141,6 +154,11 @@ defmodule Sammal.ParserCombinators do
     end
   end
 
+  @doc """
+  Parse something between two parsers.
+
+  The surrounding parser values are omitted from successful parse result.
+  """
   @spec between(parser, parser, parser) :: parser
   def between(a, b, c), do: sequence([skip(a), b, skip(c)])
 
@@ -153,6 +171,9 @@ defmodule Sammal.ParserCombinators do
     input -> {:error, input, []}
   end
 
+  @doc """
+  Transform successful parse result using given function.
+  """
   @spec transform(transformer, parser) :: parser
   def transform(f, parser), do: fn (input) ->
     case parser.(input) do
@@ -164,7 +185,9 @@ defmodule Sammal.ParserCombinators do
   end
 
   @doc """
-  Delay parser evaluation to prevent infinite loops in self-referential parsers.
+  Wrap parser in a thunk to delay evaluation.
+
+  Has the effect of preventing infinite loops in self-referential parsers.
   """
   @spec delay((() -> parser)) :: parser
   def delay(parser_func), do: fn (input) ->
