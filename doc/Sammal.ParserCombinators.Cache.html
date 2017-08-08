@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.16.2">
-    <title>Sammal – Sammal v0.1.0</title>
+    <title>Sammal.ParserCombinators.Cache – Sammal v0.1.0</title>
     <link rel="stylesheet" href="dist/app-268c9dc719.css" />
     
     <script src="dist/sidebar_items-b51610fb27.js"></script>
@@ -62,9 +62,9 @@
 
       <h1>
         <small class="visible-xs">Sammal v0.1.0</small>
-        Sammal
+        Sammal.ParserCombinators.Cache
         
-          <a href="https://github.com/epiphone/sammal/blob/master/lib/sammal.ex#L1" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/cache.ex#L1" title="View Source" class="view-source" rel="help">
             <span class="icon-code" aria-hidden="true"></span>
             <span class="sr-only">View Source</span>
           </a>
@@ -73,7 +73,9 @@
 
       
         <section id="moduledoc">
-          <p>Sammal main module.</p>
+          <p>A cache for function memoization.</p>
+<p>We’re using Erlang’s built-in in-memory storage
+<a href="http://learnyousomeerlang.com/ets">ETS</a> to store our memoization table.</p>
 
         </section>
       
@@ -96,23 +98,29 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#main/1">main(args)</a>
+    <a href="#get/1">get(key)</a>
   </div>
   
-    <div class="summary-synopsis"><p>Program entry point</p>
+    <div class="summary-synopsis"><p>Get a memoized value by key</p>
 </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#run_command/1">run_command(input)</a>
+    <a href="#init_if_not_exists/0">init_if_not_exists()</a>
   </div>
+  
+    <div class="summary-synopsis"><p>Initialize memoization table if it’s not already initialized</p>
+</div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#show_failure/2">show_failure(errors, header \\ &quot;Syntax error&quot;)</a>
+    <a href="#put/2">put(key, val)</a>
   </div>
+  
+    <div class="summary-synopsis"><p>Insert a new memoized value</p>
+</div>
   
 </div>
 
@@ -135,16 +143,16 @@
             </a>
             Functions
           </h1>
-          <div class="detail" id="main/1">
+          <div class="detail" id="get/1">
   
   <div class="detail-header">
-    <a href="#main/1" class="detail-link" title="Link to this function">
+    <a href="#get/1" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">main(args)</span>
+    <span class="signature">get(key)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/sammal.ex#L11" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/cache.ex#L23" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -153,20 +161,20 @@
     
   </div>
   <section class="docstring">
-    <p>Program entry point.</p>
+    <p>Get a memoized value by key.</p>
 
   </section>
 </div>
-<div class="detail" id="run_command/1">
+<div class="detail" id="init_if_not_exists/0">
   
   <div class="detail-header">
-    <a href="#run_command/1" class="detail-link" title="Link to this function">
+    <a href="#init_if_not_exists/0" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">run_command(input)</span>
+    <span class="signature">init_if_not_exists()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/sammal.ex#L37" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/cache.ex#L14" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -175,21 +183,20 @@
     
   </div>
   <section class="docstring">
-    
+    <p>Initialize memoization table if it’s not already initialized.</p>
+
   </section>
 </div>
-<div class="detail" id="show_failure/2">
-  
-    <span id="show_failure/1"></span>
+<div class="detail" id="put/2">
   
   <div class="detail-header">
-    <a href="#show_failure/2" class="detail-link" title="Link to this function">
+    <a href="#put/2" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">show_failure(errors, header \\ &quot;Syntax error&quot;)</span>
+    <span class="signature">put(key, val)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/sammal.ex#L47" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/cache.ex#L33" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -198,7 +205,8 @@
     
   </div>
   <section class="docstring">
-    
+    <p>Insert a new memoized value.</p>
+
   </section>
 </div>
 

@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.16.2">
-    <title>Sammal – Sammal v0.1.0</title>
+    <title>Sammal.ParserCombinators.DefParser – Sammal v0.1.0</title>
     <link rel="stylesheet" href="dist/app-268c9dc719.css" />
     
     <script src="dist/sidebar_items-b51610fb27.js"></script>
@@ -62,9 +62,9 @@
 
       <h1>
         <small class="visible-xs">Sammal v0.1.0</small>
-        Sammal
+        Sammal.ParserCombinators.DefParser
         
-          <a href="https://github.com/epiphone/sammal/blob/master/lib/sammal.ex#L1" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/def_parser.ex#L1" title="View Source" class="view-source" rel="help">
             <span class="icon-code" aria-hidden="true"></span>
             <span class="sr-only">View Source</span>
           </a>
@@ -73,7 +73,7 @@
 
       
         <section id="moduledoc">
-          <p>Sammal main module.</p>
+          <p>A macro wrapper for parser combinators.</p>
 
         </section>
       
@@ -96,23 +96,11 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#main/1">main(args)</a>
+    <a href="#def_parser/2">def_parser(head, list)</a>
   </div>
   
-    <div class="summary-synopsis"><p>Program entry point</p>
+    <div class="summary-synopsis"><p>Define a memoized continuation passing style parser combinator</p>
 </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#run_command/1">run_command(input)</a>
-  </div>
-  
-</div>
-<div class="summary-row">
-  <div class="summary-signature">
-    <a href="#show_failure/2">show_failure(errors, header \\ &quot;Syntax error&quot;)</a>
-  </div>
   
 </div>
 
@@ -135,70 +123,29 @@
             </a>
             Functions
           </h1>
-          <div class="detail" id="main/1">
+          <div class="detail" id="def_parser/2">
   
   <div class="detail-header">
-    <a href="#main/1" class="detail-link" title="Link to this function">
+    <a href="#def_parser/2" class="detail-link" title="Link to this macro">
       <span class="icon-link" aria-hidden="true"></span>
-      <span class="sr-only">Link to this function</span>
+      <span class="sr-only">Link to this macro</span>
     </a>
-    <span class="signature">main(args)</span>
+    <span class="signature">def_parser(head, list)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/sammal.ex#L11" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/def_parser.ex#L13" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
     
     
+      <span class="note">(macro)</span>
+    
     
   </div>
   <section class="docstring">
-    <p>Program entry point.</p>
+    <p>Define a memoized continuation passing style parser combinator.</p>
+<p>Memoization adapted from: (Gustavo Brunoro) https://gist.github.com/brunoro/6159378</p>
 
-  </section>
-</div>
-<div class="detail" id="run_command/1">
-  
-  <div class="detail-header">
-    <a href="#run_command/1" class="detail-link" title="Link to this function">
-      <span class="icon-link" aria-hidden="true"></span>
-      <span class="sr-only">Link to this function</span>
-    </a>
-    <span class="signature">run_command(input)</span>
-    
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/sammal.ex#L37" class="view-source" rel="help" title="View Source">
-       <span class="icon-code" aria-hidden="true"></span>
-       <span class="sr-only">View Source</span>
-     </a>
-    
-    
-    
-  </div>
-  <section class="docstring">
-    
-  </section>
-</div>
-<div class="detail" id="show_failure/2">
-  
-    <span id="show_failure/1"></span>
-  
-  <div class="detail-header">
-    <a href="#show_failure/2" class="detail-link" title="Link to this function">
-      <span class="icon-link" aria-hidden="true"></span>
-      <span class="sr-only">Link to this function</span>
-    </a>
-    <span class="signature">show_failure(errors, header \\ &quot;Syntax error&quot;)</span>
-    
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/sammal.ex#L47" class="view-source" rel="help" title="View Source">
-       <span class="icon-code" aria-hidden="true"></span>
-       <span class="sr-only">View Source</span>
-     </a>
-    
-    
-    
-  </div>
-  <section class="docstring">
-    
   </section>
 </div>
 

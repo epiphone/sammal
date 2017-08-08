@@ -8,9 +8,7 @@
     <title>Sammal.ParserV2 – Sammal v0.1.0</title>
     <link rel="stylesheet" href="dist/app-268c9dc719.css" />
     
-      <link rel="canonical" href="https://hexdocs.pm/sammal/Sammal.ParserV2.html" />
-    
-    <script src="dist/sidebar_items-0c6732b41e.js"></script>
+    <script src="dist/sidebar_items-b51610fb27.js"></script>
   </head>
   <body data-type="modules">
     <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
@@ -81,6 +79,7 @@
   Grammar
 </h2>
 
+<p>TODO http://www.scheme.com/tspl2d/grammar.html</p>
 <pre><code class="elixir">primitive   : number | symbol | string
 form:       : ( expression* )
 expression  : quoted | primitive | form
@@ -205,10 +204,10 @@ sammal      : expression+</code></pre>
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#token/2">token(value_or_predicate, error \\ :unexpected)</a>
+    <a href="#token/1">token(value_or_predicate)</a>
   </div>
   
-    <div class="summary-synopsis"><p>Parse a <a href="Sammal.Expr.html"><code class="inline">Sammal.Expr</code></a> struct that matches a given value or predicate</p>
+    <div class="summary-synopsis"><p>Parse a <a href="Sammal.Expr.html"><code class="inline">Sammal.Expr</code></a> struct that matches given value or predicate</p>
 </div>
   
 </div>
@@ -240,7 +239,7 @@ sammal      : expression+</code></pre>
     </a>
     <span class="signature">error()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L20" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L21" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -249,7 +248,7 @@ sammal      : expression+</code></pre>
     
       <div class="specs">
         
-          <pre>error() :: atom</pre>
+          <pre>error() :: {label :: atom, context :: Sammal.Expr} | {:eof, nil}</pre>
         
       </div>
     
@@ -267,7 +266,7 @@ sammal      : expression+</code></pre>
     </a>
     <span class="signature">parser()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L21" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L22" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -294,7 +293,7 @@ sammal      : expression+</code></pre>
     </a>
     <span class="signature">result()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L19" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L20" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -335,7 +334,7 @@ sammal      : expression+</code></pre>
     </a>
     <span class="signature">expression()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L64" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L65" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -363,7 +362,7 @@ sammal      : expression+</code></pre>
     </a>
     <span class="signature">form()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L76" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L77" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -391,7 +390,7 @@ sammal      : expression+</code></pre>
     </a>
     <span class="signature">number()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L45" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L46" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -419,7 +418,7 @@ sammal      : expression+</code></pre>
     </a>
     <span class="signature">primitive()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L60" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L61" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -447,7 +446,7 @@ sammal      : expression+</code></pre>
     </a>
     <span class="signature">quoted()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L68" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L69" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -475,7 +474,7 @@ sammal      : expression+</code></pre>
     </a>
     <span class="signature">sammal()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L80" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L82" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -503,7 +502,7 @@ sammal      : expression+</code></pre>
     </a>
     <span class="signature">string()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L49" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L50" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -531,7 +530,7 @@ sammal      : expression+</code></pre>
     </a>
     <span class="signature">symbol()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L53" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L54" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -550,18 +549,16 @@ sammal      : expression+</code></pre>
 
   </section>
 </div>
-<div class="detail" id="token/2">
-  
-    <span id="token/1"></span>
+<div class="detail" id="token/1">
   
   <div class="detail-header">
-    <a href="#token/2" class="detail-link" title="Link to this function">
+    <a href="#token/1" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">token(value_or_predicate, error \\ :unexpected)</span>
+    <span class="signature">token(value_or_predicate)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L26" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_v2.ex#L39" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -570,13 +567,13 @@ sammal      : expression+</code></pre>
     
       <div class="specs">
         
-          <pre>token(any | (any -> boolean), <a href="#t:error/0">error</a>) :: <a href="#t:parser/0">parser</a></pre>
+          <pre>token(any | (any -> boolean)) :: <a href="#t:parser/0">parser</a></pre>
         
       </div>
     
   </div>
   <section class="docstring">
-    <p>Parse a <a href="Sammal.Expr.html"><code class="inline">Sammal.Expr</code></a> struct that matches a given value or predicate.</p>
+    <p>Parse a <a href="Sammal.Expr.html"><code class="inline">Sammal.Expr</code></a> struct that matches given value or predicate.</p>
 
   </section>
 </div>

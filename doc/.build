@@ -5,7 +5,7 @@ fonts/icomoon.eot
 fonts/icomoon.svg
 fonts/icomoon.ttf
 fonts/icomoon.woff
-dist/sidebar_items-0c6732b41e.js
+dist/sidebar_items-b51610fb27.js
 api-reference.html
 404.html
 Sammal.html
@@ -14,8 +14,11 @@ Sammal.Eval.html
 Sammal.Expr.html
 Sammal.Parser.html
 Sammal.ParserCombinators.html
+Sammal.ParserCombinators.Cache.html
+Sammal.ParserCombinators.DefParser.html
 Sammal.ParserV2.html
 Sammal.SammalError.html
+Sammal.TestParsers.html
 Sammal.Tokenizer.html
 Sammal.Utils.html
 index.html

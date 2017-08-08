@@ -8,9 +8,7 @@
     <title>Sammal.ParserCombinators – Sammal v0.1.0</title>
     <link rel="stylesheet" href="dist/app-268c9dc719.css" />
     
-      <link rel="canonical" href="https://hexdocs.pm/sammal/Sammal.ParserCombinators.html" />
-    
-    <script src="dist/sidebar_items-0c6732b41e.js"></script>
+    <script src="dist/sidebar_items-b51610fb27.js"></script>
   </head>
   <body data-type="modules">
     <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
@@ -66,7 +64,7 @@
         <small class="visible-xs">Sammal v0.1.0</small>
         Sammal.ParserCombinators
         
-          <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L1" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L1" title="View Source" class="view-source" rel="help">
             <span class="icon-code" aria-hidden="true"></span>
             <span class="sr-only">View Source</span>
           </a>
@@ -75,8 +73,8 @@
 
       
         <section id="moduledoc">
-          <p>Experimenting with parser combinators.
-TODO docs</p>
+          <p>Basic parser combinator building blocks.</p>
+<p>Use these to compose your own grammar.</p>
 
         </section>
       
@@ -136,7 +134,7 @@ TODO docs</p>
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#any/1">any(list)</a>
+    <a href="#any/2">any(list, errors)</a>
   </div>
   
 </div>
@@ -144,6 +142,9 @@ TODO docs</p>
   <div class="summary-signature">
     <a href="#between/3">between(a, b, c)</a>
   </div>
+  
+    <div class="summary-synopsis"><p>Parse something between two parsers</p>
+</div>
   
 </div>
 <div class="summary-row">
@@ -157,7 +158,16 @@ TODO docs</p>
     <a href="#delay/1">delay(parser_func)</a>
   </div>
   
-    <div class="summary-synopsis"><p>Delay parser evaluation to handle infinite loops in self-referential parsers</p>
+    <div class="summary-synopsis"><p>Wrap parser in a thunk to delay evaluation</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#describe/2">describe(parser, expected)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Override parser’s expected value that is shown in parse errors</p>
 </div>
   
 </div>
@@ -172,11 +182,35 @@ TODO docs</p>
     <a href="#eof/0">eof()</a>
   </div>
   
+    <div class="summary-synopsis"><p>Parse end of file</p>
+</div>
+  
 </div>
 <div class="summary-row">
   <div class="summary-signature">
     <a href="#many/1">many(parser)</a>
   </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#many1/1">many1(parser)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#number/0">number()</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#required/1">required(parser)</a>
+  </div>
+  
+    <div class="summary-synopsis"><p>Turn parser failure into a fatal exception</p>
+</div>
   
 </div>
 <div class="summary-row">
@@ -193,14 +227,20 @@ TODO docs</p>
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#symbol/1">symbol(symbol)</a>
+    <a href="#string/1">string(string)</a>
   </div>
+  
+    <div class="summary-synopsis"><p>Parse given string</p>
+</div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
     <a href="#transform/2">transform(f, parser)</a>
   </div>
+  
+    <div class="summary-synopsis"><p>Transform successful parse result using given function</p>
+</div>
   
 </div>
 <div class="summary-row">
@@ -246,7 +286,7 @@ TODO docs</p>
     </a>
     <span class="signature">error()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L8" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L9" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -273,7 +313,7 @@ TODO docs</p>
     </a>
     <span class="signature">parser()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L10" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L11" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -282,7 +322,7 @@ TODO docs</p>
     
       <div class="specs">
         
-          <pre>parser() :: (input :: [<a href="#t:token/0">token</a>] -> {:ok, <a href="#t:result/0">result</a>} | {:error, <a href="#t:error/0">error</a>})</pre>
+          <pre>parser() :: (input :: [<a href="#t:token/0">token</a>] -> {:ok, <a href="#t:result/0">result</a>} | {:error, remaining :: [<a href="#t:token/0">token</a>]})</pre>
         
       </div>
     
@@ -300,7 +340,7 @@ TODO docs</p>
     </a>
     <span class="signature">result()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L7" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L8" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -327,7 +367,7 @@ TODO docs</p>
     </a>
     <span class="signature">token()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L6" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L7" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -354,7 +394,7 @@ TODO docs</p>
     </a>
     <span class="signature">transformer()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L11" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L12" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -386,27 +426,21 @@ TODO docs</p>
             </a>
             Functions
           </h1>
-          <div class="detail" id="any/1">
+          <div class="detail" id="any/2">
   
   <div class="detail-header">
-    <a href="#any/1" class="detail-link" title="Link to this function">
+    <a href="#any/2" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">any(list)</span>
+    <span class="signature">any(list, errors)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L65" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L98" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
     
     
-    
-      <div class="specs">
-        
-          <pre>any([<a href="#t:parser/0">parser</a>]) :: <a href="#t:parser/0">parser</a></pre>
-        
-      </div>
     
   </div>
   <section class="docstring">
@@ -422,7 +456,7 @@ TODO docs</p>
     </a>
     <span class="signature">between(a, b, c)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L116" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L163" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -437,7 +471,9 @@ TODO docs</p>
     
   </div>
   <section class="docstring">
-    
+    <p>Parse something between two parsers.</p>
+<p>The surrounding parser values are omitted from successful parse result.</p>
+
   </section>
 </div>
 <div class="detail" id="both/2">
@@ -449,7 +485,7 @@ TODO docs</p>
     </a>
     <span class="signature">both(a, b)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L25" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L68" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -476,7 +512,7 @@ TODO docs</p>
     </a>
     <span class="signature">delay(parser_func)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L138" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L193" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -491,7 +527,46 @@ TODO docs</p>
     
   </div>
   <section class="docstring">
-    <p>Delay parser evaluation to handle infinite loops in self-referential parsers.</p>
+    <p>Wrap parser in a thunk to delay evaluation.</p>
+<p>Has the effect of preventing infinite loops in self-referential parsers.</p>
+
+  </section>
+</div>
+<div class="detail" id="describe/2">
+  
+  <div class="detail-header">
+    <a href="#describe/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">describe(parser, expected)</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L48" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>describe(<a href="#t:parser/0">parser</a>, any) :: <a href="#t:parser/0">parser</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Override parser’s expected value that is shown in parse errors.</p>
+<h2 id="describe/2-examples" class="section-heading">
+  <a href="#describe/2-examples" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
+  Examples
+</h2>
+
+<pre><code class="iex elixir">iex&gt; parser = Sammal.ParserCombinators.string(&quot;x&quot;)
+iex&gt; parser.([&quot;y&quot;])
+{:error, [&quot;y&quot;], &quot;x&quot;}
+iex&gt; Sammal.ParserCombinators.describe(parser, &quot;something else&quot;).([&quot;y&quot;])
+{:error, [&quot;y&quot;], &quot;something else&quot;}</code></pre>
 
   </section>
 </div>
@@ -504,7 +579,7 @@ TODO docs</p>
     </a>
     <span class="signature">either(a, b)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L35" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L71" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -531,7 +606,7 @@ TODO docs</p>
     </a>
     <span class="signature">eof()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L119" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L169" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -546,7 +621,8 @@ TODO docs</p>
     
   </div>
   <section class="docstring">
-    
+    <p>Parse end of file.</p>
+
   </section>
 </div>
 <div class="detail" id="many/1">
@@ -558,7 +634,7 @@ TODO docs</p>
     </a>
     <span class="signature">many(parser)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L43" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L74" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -576,6 +652,88 @@ TODO docs</p>
     
   </section>
 </div>
+<div class="detail" id="many1/1">
+  
+  <div class="detail-header">
+    <a href="#many1/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">many1(parser)</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L86" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>many1(<a href="#t:parser/0">parser</a>) :: <a href="#t:parser/0">parser</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+<div class="detail" id="number/0">
+  
+  <div class="detail-header">
+    <a href="#number/0" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">number()</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L29" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>number() :: <a href="#t:parser/0">parser</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+<div class="detail" id="required/1">
+  
+  <div class="detail-header">
+    <a href="#required/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">required(parser)</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L202" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+      <div class="specs">
+        
+          <pre>required(<a href="#t:parser/0">parser</a>) :: <a href="#t:parser/0">parser</a></pre>
+        
+      </div>
+    
+  </div>
+  <section class="docstring">
+    <p>Turn parser failure into a fatal exception.</p>
+
+  </section>
+</div>
 <div class="detail" id="sequence/1">
   
   <div class="detail-header">
@@ -585,7 +743,7 @@ TODO docs</p>
     </a>
     <span class="signature">sequence(parsers)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L91" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L135" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -612,7 +770,7 @@ TODO docs</p>
     </a>
     <span class="signature">skip(parser)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L55" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L89" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -630,16 +788,16 @@ TODO docs</p>
     
   </section>
 </div>
-<div class="detail" id="symbol/1">
+<div class="detail" id="string/1">
   
   <div class="detail-header">
-    <a href="#symbol/1" class="detail-link" title="Link to this function">
+    <a href="#string/1" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">symbol(symbol)</span>
+    <span class="signature">string(string)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L19" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L23" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -648,13 +806,14 @@ TODO docs</p>
     
       <div class="specs">
         
-          <pre>symbol(<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>) :: <a href="#t:parser/0">parser</a></pre>
+          <pre>string(<a href="https://hexdocs.pm/elixir/String.html#t:t/0">String.t</a>) :: <a href="#t:parser/0">parser</a></pre>
         
       </div>
     
   </div>
   <section class="docstring">
-    
+    <p>Parse given string.</p>
+
   </section>
 </div>
 <div class="detail" id="transform/2">
@@ -666,7 +825,7 @@ TODO docs</p>
     </a>
     <span class="signature">transform(f, parser)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L125" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L178" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -681,7 +840,8 @@ TODO docs</p>
     
   </div>
   <section class="docstring">
-    
+    <p>Transform successful parse result using given function.</p>
+
   </section>
 </div>
 <div class="detail" id="until/2">
@@ -693,7 +853,7 @@ TODO docs</p>
     </a>
     <span class="signature">until(parser, stop)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L74" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L118" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -720,7 +880,7 @@ TODO docs</p>
     </a>
     <span class="signature">wrap(parser)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators.ex#L147" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/parser_combinators/parser_combinators.ex#L213" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>

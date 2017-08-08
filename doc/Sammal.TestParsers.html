@@ -5,7 +5,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="ExDoc v0.16.2">
-    <title>Sammal.Env – Sammal v0.1.0</title>
+    <title>Sammal.TestParsers – Sammal v0.1.0</title>
     <link rel="stylesheet" href="dist/app-268c9dc719.css" />
     
     <script src="dist/sidebar_items-b51610fb27.js"></script>
@@ -62,9 +62,9 @@
 
       <h1>
         <small class="visible-xs">Sammal v0.1.0</small>
-        Sammal.Env
+        Sammal.TestParsers
         
-          <a href="https://github.com/epiphone/sammal/blob/master/lib/env.ex#L1" title="View Source" class="view-source" rel="help">
+          <a href="https://github.com/epiphone/sammal/blob/master/lib/test_parsers.ex#L1" title="View Source" class="view-source" rel="help">
             <span class="icon-code" aria-hidden="true"></span>
             <span class="sr-only">View Source</span>
           </a>
@@ -73,7 +73,11 @@
 
       
         <section id="moduledoc">
-          <p>Sammal evaluation environment.</p>
+          <p>Various parsers used for examples and tests.</p>
+<p>Parsers are defined here as opposed to defining them inline in test modules
+for a) readability, and b) because for recursive grammars we need
+self-referential functions and Elixir doesn’t support self-referential
+anonymous (or inline) functions.</p>
 
         </section>
       
@@ -96,53 +100,68 @@
     </h2>
     <div class="summary-row">
   <div class="summary-signature">
-    <a href="#assign/3">assign(env, var, val)</a>
+    <a href="#ambiguous_calc/0">ambiguous_calc()</a>
   </div>
   
-    <div class="summary-synopsis"><p>Assign variable into given environment</p>
+    <div class="summary-synopsis"><p>Parse a simple ambiguous calculus grammar</p>
 </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#division/1">division(xs)</a>
+    <a href="#any/1">any(parsers)</a>
   </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#global/0">global()</a>
+    <a href="#bind/2">bind(parser, f)</a>
   </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#lookup_var/2">lookup_var(arg1, var)</a>
+    <a href="#left_recursive/0">left_recursive()</a>
   </div>
   
-    <div class="summary-synopsis"><p>Look up variable first from local scope, then from parent scopes</p>
+    <div class="summary-synopsis"><p>Parse a simple directly left-recursive grammar</p>
 </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#product/1">product(list)</a>
+    <a href="#memo_string/1">memo_string(string)</a>
   </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#subtract/1">subtract(xs)</a>
+    <a href="#number/0">number()</a>
   </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature">
-    <a href="#top_level?/1">top_level?(env)</a>
+    <a href="#seq/2">seq(parsers, acc \\ [])</a>
   </div>
   
-    <div class="summary-synopsis"><p>Return true if given env is the top-level (or global) scope</p>
 </div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#string/1">string(string)</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#test/0">test()</a>
+  </div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#transform/2">transform(parser, f)</a>
+  </div>
   
 </div>
 
@@ -165,16 +184,16 @@
             </a>
             Functions
           </h1>
-          <div class="detail" id="assign/3">
+          <div class="detail" id="ambiguous_calc/0">
   
   <div class="detail-header">
-    <a href="#assign/3" class="detail-link" title="Link to this function">
+    <a href="#ambiguous_calc/0" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">assign(env, var, val)</span>
+    <span class="signature">ambiguous_calc()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/env.ex#L37" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/test_parsers.ex#L76" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -183,20 +202,21 @@
     
   </div>
   <section class="docstring">
-    <p>Assign variable into given environment.</p>
+    <p>Parse a simple ambiguous calculus grammar:</p>
+<p>  E → E + E | E * E | E | number</p>
 
   </section>
 </div>
-<div class="detail" id="division/1">
+<div class="detail" id="any/1">
   
   <div class="detail-header">
-    <a href="#division/1" class="detail-link" title="Link to this function">
+    <a href="#any/1" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">division(xs)</span>
+    <span class="signature">any(parsers)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/env.ex#L18" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/test_parsers.ex#L16" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -208,16 +228,16 @@
     
   </section>
 </div>
-<div class="detail" id="global/0">
+<div class="detail" id="bind/2">
   
   <div class="detail-header">
-    <a href="#global/0" class="detail-link" title="Link to this function">
+    <a href="#bind/2" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">global()</span>
+    <span class="signature">bind(parser, f)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/env.ex#L20" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/test_parsers.ex#L20" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -229,16 +249,16 @@
     
   </section>
 </div>
-<div class="detail" id="lookup_var/2">
+<div class="detail" id="left_recursive/0">
   
   <div class="detail-header">
-    <a href="#lookup_var/2" class="detail-link" title="Link to this function">
+    <a href="#left_recursive/0" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">lookup_var(arg1, var)</span>
+    <span class="signature">left_recursive()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/env.ex#L45" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/test_parsers.ex#L66" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -247,20 +267,21 @@
     
   </div>
   <section class="docstring">
-    <p>Look up variable first from local scope, then from parent scopes.</p>
+    <p>Parse a simple directly left-recursive grammar:</p>
+<p>  E → E + number | number</p>
 
   </section>
 </div>
-<div class="detail" id="product/1">
+<div class="detail" id="memo_string/1">
   
   <div class="detail-header">
-    <a href="#product/1" class="detail-link" title="Link to this function">
+    <a href="#memo_string/1" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">product(list)</span>
+    <span class="signature">memo_string(string)</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/env.ex#L14" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/test_parsers.ex#L49" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -272,16 +293,16 @@
     
   </section>
 </div>
-<div class="detail" id="subtract/1">
+<div class="detail" id="number/0">
   
   <div class="detail-header">
-    <a href="#subtract/1" class="detail-link" title="Link to this function">
+    <a href="#number/0" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">subtract(xs)</span>
+    <span class="signature">number()</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/env.ex#L11" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/test_parsers.ex#L39" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -293,16 +314,18 @@
     
   </section>
 </div>
-<div class="detail" id="top_level?/1">
+<div class="detail" id="seq/2">
+  
+    <span id="seq/1"></span>
   
   <div class="detail-header">
-    <a href="#top_level?/1" class="detail-link" title="Link to this function">
+    <a href="#seq/2" class="detail-link" title="Link to this function">
       <span class="icon-link" aria-hidden="true"></span>
       <span class="sr-only">Link to this function</span>
     </a>
-    <span class="signature">top_level?(env)</span>
+    <span class="signature">seq(parsers, acc \\ [])</span>
     
-      <a href="https://github.com/epiphone/sammal/blob/master/lib/env.ex#L58" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/test_parsers.ex#L33" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -311,9 +334,70 @@
     
   </div>
   <section class="docstring">
-    <p>Return true if given env is the top-level (or global) scope.</p>
-<p>Some operations (e.g. <code class="inline">define</code>) are only valid in the top-level scope.</p>
-
+    
+  </section>
+</div>
+<div class="detail" id="string/1">
+  
+  <div class="detail-header">
+    <a href="#string/1" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">string(string)</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/test_parsers.ex#L44" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+<div class="detail" id="test/0">
+  
+  <div class="detail-header">
+    <a href="#test/0" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">test()</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/test_parsers.ex#L14" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    
+  </section>
+</div>
+<div class="detail" id="transform/2">
+  
+  <div class="detail-header">
+    <a href="#transform/2" class="detail-link" title="Link to this function">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this function</span>
+    </a>
+    <span class="signature">transform(parser, f)</span>
+    
+      <a href="https://github.com/epiphone/sammal/blob/master/lib/test_parsers.ex#L54" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+    
+    
+    
+  </div>
+  <section class="docstring">
+    
   </section>
 </div>
 
