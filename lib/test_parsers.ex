@@ -3,20 +3,21 @@ defmodule Sammal.TestParsers do
   Various parsers used for examples and tests.
 
   Parsers are defined here as opposed to defining them inline in test modules
-  for a) readability, and b) because Elixir doesn't support self-referential
-  anonymous (inline) functions which are required for some recursive parsers.
+  for a) readability, and b) because for recursive grammars we need
+  self-referential functions and Elixir doesn't support self-referential
+  anonymous (or inline) functions.
   """
-  import Sammal.Memoization
-  import Sammal.ParserCombinators
+  # import Sammal.ParserCombinators
+  import Sammal.ParserCombinators.DefParser
 
 
-  def test(), do: cps_left_recursive().([12], &(&1))
+  def test(), do: ambiguous_calc().([12, "+", 13, "*", 4], &(&1))
 
-  defcpsparser cps_any(parsers), do: fn (input, cont) ->
+  def_parser any(parsers), do: fn (input, cont) ->
     for parser <- parsers, do: parser.(input, cont)
   end
 
-  def cps_bind(parser, f), do: fn (input, cont) ->
+  def bind(parser, f), do: fn (input, cont) ->
     parser.(input, fn (res) ->
       case res do
         {:ok, {value, rest}} ->
@@ -27,32 +28,34 @@ defmodule Sammal.TestParsers do
     end)
   end
 
-  def cps_seq(parsers, acc \\ [])
-  defcpsparser cps_seq([], acc), do: fn (input, cont) -> cont.({:ok, {acc, input}}) end
-  defcpsparser cps_seq([parser | rem_parsers], acc) do
-    cps_bind(fn (input, cont) -> parser.(input, cont) end, fn (value) ->
-      cps_seq(rem_parsers, acc ++ value)
+  def seq(parsers, acc \\ [])
+  def_parser seq([], acc), do: fn (input, cont) -> cont.({:ok, {acc, input}}) end
+  def_parser seq([parser | rem_parsers], acc) do
+    bind(fn (input, cont) -> parser.(input, cont) end, fn (value) ->
+      seq(rem_parsers, acc ++ value)
     end)
   end
 
-  def cps_number(), do: fn
+  def number(), do: fn
     ([head | rest], cont) when is_number(head) -> cont.({:ok, {[head], rest}})
     (input, cont) -> cont.({:error, input, "a number"})
   end
 
-  def cps_string(string), do: fn
+  def string(string), do: fn
     ([^string | rest], cont) -> cont.({:ok, {[string], rest}})
     (input, cont) -> cont.({:error, input, string})
   end
 
-  defcpsparser memo_cps_string(string), do: fn
+  def_parser memo_string(string), do: fn
     ([^string | rest], cont) -> cont.({:ok, {[string], rest}})
     (input, cont) -> cont.({:error, input, string})
   end
 
-  def cps_delay(parser_fn), do: fn (input, cont) ->
-    parser = parser_fn.()
-    parser.(input, cont)
+  def transform(parser, f), do: fn (input, cont) ->
+    parser.(input, fn
+      ({:ok, {val, rest}}) -> cont.({:ok, {f.(val), rest}})
+      (err) -> cont.(err)
+    end)
   end
 
   @doc """
@@ -60,33 +63,29 @@ defmodule Sammal.TestParsers do
 
     E → E + number | number
   """
-  defcpsparser cps_left_recursive(), do: cps_any([
-    cps_seq([cps_delay(&cps_left_recursive/0), cps_string("+"), cps_number]),
-    cps_number
+  def_parser left_recursive(), do: any([
+    seq([left_recursive(), string("+"), number]),
+    number
   ])
-  # def left_recursive(), do: any([
-  #   sequence([delay(&left_recursive/0), string("+"), number]),
-  #   number
-  # ])
 
   @doc """
   Parse a simple ambiguous calculus grammar:
 
     E → E + E | E * E | E | number
   """
-  def ambiguous_calc(), do: any([
-    sequence([delay(&ambiguous_calc/0), string("+"), delay(&ambiguous_calc/0)]),
-    sequence([delay(&ambiguous_calc/0), string("*"), delay(&ambiguous_calc/0)]), # TODO fix not resolving all ambigous parsers
-    delay(&ambiguous_calc/0),
+  def_parser ambiguous_calc(), do: any([
+    transform(
+      seq([ambiguous_calc(), string("+"), ambiguous_calc()]),
+      &[&1]
+    ),
+    transform(
+      seq([ambiguous_calc(), string("*"), ambiguous_calc()]),
+      &[&1]
+    ),
+    ambiguous_calc(),
     number
   ])
 
-  defcpsparser cps_ambiguous_calc(), do: cps_any([
-    cps_seq([cps_delay(&cps_ambiguous_calc/0), cps_string("+"), cps_delay(&cps_ambiguous_calc/0)]),
-    cps_seq([cps_delay(&cps_ambiguous_calc/0), cps_string("*"), cps_delay(&cps_ambiguous_calc/0)]),
-    cps_delay(&cps_ambiguous_calc/0),
-    cps_number
-  ])
 
   # TODO test https://en.wikipedia.org/wiki/Dangling_else
 end
